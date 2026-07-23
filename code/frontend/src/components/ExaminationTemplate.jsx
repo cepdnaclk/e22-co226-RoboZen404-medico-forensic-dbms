@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-const ExaminationTemplate = ({ caseDetail, internalExam }) => {
+const ExaminationTemplate = forwardRef(({ caseDetail, internalExam }, ref) => {
   if (!caseDetail) return null;
 
-  const data = internalExam?.ExaminationData 
+  const data = internalExam?.ExaminationData
     ? (typeof internalExam.ExaminationData === 'string' ? JSON.parse(internalExam.ExaminationData) : internalExam.ExaminationData)
     : {};
 
@@ -19,11 +19,11 @@ const ExaminationTemplate = ({ caseDetail, internalExam }) => {
   };
 
   const SectionHeader = ({ title }) => (
-    <div style={{ 
-      backgroundColor: '#f3f4f6', 
-      padding: '8px 12px', 
-      fontWeight: 'bold', 
-      fontSize: '12px', 
+    <div style={{
+      backgroundColor: '#f3f4f6',
+      padding: '8px 12px',
+      fontWeight: 'bold',
+      fontSize: '12px',
       color: '#1f2937',
       borderBottom: '1.5px solid #1f2937',
       letterSpacing: '0.5px',
@@ -68,7 +68,7 @@ const ExaminationTemplate = ({ caseDetail, internalExam }) => {
   );
 
   return (
-    <div style={{ backgroundColor: '#f3f4f6' }}>
+    <div ref={ref} style={{ backgroundColor: '#f3f4f6' }}>
       {/* Page 1 */}
       <div className="pdf-page" style={pageStyle}>
         <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #111827', paddingBottom: '15px' }}>
@@ -196,7 +196,7 @@ const ExaminationTemplate = ({ caseDetail, internalExam }) => {
           <FieldRow label="Underlying Cause" value={caseDetail.causeOfDeath?.UnderlyingCause} />
           <LongFieldRow label="Comments" value={caseDetail.causeOfDeath?.Comments} hideBottomBorder={true} />
         </div>
-        
+
         <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ width: '30%' }}>
             <div style={{ borderBottom: '1px solid #111827', marginBottom: '4px' }}></div>
@@ -210,6 +210,6 @@ const ExaminationTemplate = ({ caseDetail, internalExam }) => {
       </div>
     </div>
   );
-};
+});
 
 export default ExaminationTemplate;

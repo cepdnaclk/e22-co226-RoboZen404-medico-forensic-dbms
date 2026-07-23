@@ -8,14 +8,14 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
   // Premium Checkbox Component
   const Checkbox = ({ checked, label }) => (
     <div style={{ display: 'inline-flex', alignItems: 'center', marginRight: '12px', marginBottom: '4px' }}>
-      <div style={{ 
-        width: '12px', 
-        height: '12px', 
-        border: '1.5px solid #333', 
+      <div style={{
+        width: '12px',
+        height: '12px',
+        border: '1.5px solid #333',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        marginRight: '6px', 
+        marginRight: '6px',
         borderRadius: '2px',
         backgroundColor: checked ? '#333' : 'transparent',
         color: '#fff',
@@ -29,12 +29,12 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
   );
 
   const SectionHeader = ({ title }) => (
-    <div style={{ 
-      backgroundColor: '#f3f4f6', 
-      padding: '6px 10px', 
-      textAlign: 'center', 
-      fontWeight: 'bold', 
-      fontSize: '11px', 
+    <div style={{
+      backgroundColor: '#f3f4f6',
+      padding: '6px 10px',
+      textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: '11px',
       color: '#1f2937',
       borderBottom: '1.5px solid #1f2937',
       letterSpacing: '0.5px'
@@ -80,7 +80,7 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
       {/* PART A */}
       <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden', marginBottom: '12px' }}>
         <SectionHeader title="PART A : (1-8) To be filled by Police Officer issuing MLEF" />
-        
+
         <div style={{ display: 'flex', ...borderBottom }}>
           <div style={{ flex: 1, ...cellStyle, ...borderRight }}>
             <span style={labelStyle}>1. Police Station</span>
@@ -99,8 +99,8 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
         <div style={{ display: 'flex', ...borderBottom }}>
           <div style={{ flex: 2, ...cellStyle, ...borderRight }}>
             <span style={labelStyle}>4. Full Name and Address of the Examinee</span>
-            <span style={valueStyle}>{caseDetail.PatientName}</span><br/>
-            <span style={{...valueStyle, fontWeight: 'normal', color: '#4b5563', marginTop: '2px', display: 'block'}}>{caseDetail.Address || 'Address not provided'}</span>
+            <span style={valueStyle}>{caseDetail.PatientName}</span><br />
+            <span style={{ ...valueStyle, fontWeight: 'normal', color: '#4b5563', marginTop: '2px', display: 'block' }}>{caseDetail.Address || 'Address not provided'}</span>
           </div>
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>5. Date of Birth</span>
@@ -139,12 +139,12 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
       {/* PART B */}
       <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden' }}>
         <SectionHeader title="PART B : (9-22) To be filled by Medical Officer" />
-        
+
         <div style={{ ...cellStyle, ...borderBottom }}>
           <span style={labelStyle}>9. Produced by</span>
           <span style={valueStyle}>{partB?.ProducedBy || '................................................................'}</span>
         </div>
-        
+
         <div style={{ display: 'flex', ...borderBottom }}>
           <div style={{ flex: 1, ...cellStyle, ...borderRight }}>
             <span style={labelStyle}>10. Admission Date</span>
@@ -152,8 +152,8 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
           </div>
           <div style={{ flex: 1, ...cellStyle, ...borderRight }}>
             <span style={labelStyle}>11. Examination Date & Place</span>
-            <span style={valueStyle}>{partB?.ExaminationDate ? new Date(partB.ExaminationDate).toLocaleString() : 'N/A'}</span><br/>
-            <span style={{...valueStyle, fontWeight: 'normal', color: '#4b5563'}}>{partB?.ExaminationPlace || 'N/A'}</span>
+            <span style={valueStyle}>{partB?.ExaminationDate ? new Date(partB.ExaminationDate).toLocaleString() : 'N/A'}</span><br />
+            <span style={{ ...valueStyle, fontWeight: 'normal', color: '#4b5563' }}>{partB?.ExaminationPlace || 'N/A'}</span>
           </div>
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>12. Date of Discharge</span>
@@ -222,11 +222,11 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
         <div style={{ ...cellStyle, ...borderBottom }}>
           <span style={labelStyle}>18. Examination of Alleged Sexual Assault</span>
           <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: '4px', marginTop: '4px' }}>
-            <span style={{ fontSize: '11px', color: '#111' }}>History:</span> 
+            <span style={{ fontSize: '11px', color: '#111' }}>History:</span>
             <span style={valueStyle}>{sexualAssault?.OtherSigns || <span style={placeholderStyle}>................................................................</span>}</span>
-            <span style={{ fontSize: '11px', color: '#111' }}>Vaginal/Hymen penetration:</span> 
+            <span style={{ fontSize: '11px', color: '#111' }}>Vaginal/Hymen penetration:</span>
             <span style={valueStyle}>{sexualAssault?.HymenStatus || <span style={placeholderStyle}>................................................................</span>}</span>
-            <span style={{ fontSize: '11px', color: '#111' }}>Anal penetration:</span> 
+            <span style={{ fontSize: '11px', color: '#111' }}>Anal penetration:</span>
             <span style={valueStyle}>{sexualAssault?.PenetrationSigns || <span style={placeholderStyle}>................................................................</span>}</span>
           </div>
         </div>
@@ -254,7 +254,7 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
         <div style={{ flex: 1 }}>
           <span style={labelStyle}>Date of Examination</span>
           <span style={valueStyle}>{partB?.ExaminationDate ? new Date(partB.ExaminationDate).toLocaleDateString() : <span style={placeholderStyle}>........................</span>}</span>
-          
+
           <div style={{ marginTop: '12px' }}>
             <span style={labelStyle}>Ref No</span>
             <span style={placeholderStyle}>........................</span>
@@ -263,10 +263,10 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
         <div style={{ flex: 1, textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
           <span style={placeholderStyle}>........................................................</span>
           <span style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px' }}>Signature</span>
-          
+
           <div style={{ marginTop: '12px', textAlign: 'right' }}>
-            <span style={valueStyle}>{caseDetail.JMOName}</span><br/>
-            <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 'normal' }}>{caseDetail.Designation}</span><br/>
+            <span style={valueStyle}>{caseDetail.JMOName}</span><br />
+            <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 'normal' }}>{caseDetail.Designation}</span><br />
             <span style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px', display: 'block' }}>Name, qualifications, SLMC Reg No.</span>
           </div>
         </div>
