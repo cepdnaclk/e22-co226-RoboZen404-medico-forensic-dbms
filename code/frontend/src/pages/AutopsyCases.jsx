@@ -253,12 +253,8 @@ export default function AutopsyCases() {
     <div className="animate-in">
       {showDetail && (
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div ref={pmrRef} style={{ width: '210mm', backgroundColor: 'white', padding: '20mm' }}>
-            <PMRTemplate report={showDetail} caseDetail={showDetail} extraDetails={showDetail.internalExamination} />
-          </div>
-          <div ref={examRef} style={{ width: '210mm', backgroundColor: 'white', padding: '20mm' }}>
-            <ExaminationTemplate caseDetail={showDetail} internalExam={showDetail.internalExamination} />
-          </div>
+          <PMRTemplate ref={pmrRef} report={showDetail} caseDetail={showDetail} extraDetails={showDetail.internalExamination} />
+          <ExaminationTemplate ref={examRef} caseDetail={showDetail} internalExam={showDetail.internalExamination} />
         </div>
       )}
       <div className="section-header">
