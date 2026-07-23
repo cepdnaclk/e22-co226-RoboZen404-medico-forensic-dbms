@@ -92,8 +92,8 @@ CREATE TABLE IF NOT EXISTS `CaseAssistant` (
 -- Purpose: Live list of all lab requests currently awaiting processing.
 -- Joins: LabRequest → Specimen → ExternalAuthority → Case_Table
 -- ----------------------------------------------------------
-DROP VIEW IF EXISTS `PendingLabRequests`;
-CREATE VIEW `PendingLabRequests` AS
+DROP VIEW IF EXISTS `pendinglabrequests`;
+CREATE VIEW `pendinglabrequests` AS
 SELECT
     lr.RequestID,
     s.SpecimenType,
@@ -336,29 +336,6 @@ END$$
 DELIMITER ;
 
 
--- ----------------------------------------------------------
--- Trigger 2: AFTER UPDATE — CourtSummons
--- Logs a status change audit entry when a court summons status is updated.
--- ----------------------------------------------------------
-DROP TRIGGER IF EXISTS `trg_CourtSummons_AfterUpdate`;
-
-DELIMITER $$
-CREATE TRIGGER `trg_CourtSummons_AfterUpdate`
-AFTER UPDATE ON `CourtSummons`
-FOR EACH ROW
-BEGIN
-    IF OLD.Status <> NEW.Status THEN
-        INSERT INTO AuditLog (UserID, Action, TableName, RecordID)
-        VALUES (
-            COALESCE(@current_user_id, 1),
-            CONCAT('Court summons for Case "', NEW.CaseNo, '" status: "', OLD.Status, '" -> "', NEW.Status, '"'),
-            'CourtSummons',
-            NEW.SummonsID
-        );
-    END IF;
-END$$
-DELIMITER ;
-
 
 -- ----------------------------------------------------------
 -- Trigger 3: AFTER UPDATE — IntoxicationRecord
@@ -414,10 +391,9 @@ DELIMITER ;
 -- Single-column indexes on high-frequency filter columns
 -- to improve query performance on status and type lookups.
 
-CREATE INDEX `idx_case_status`         ON `Case_Table`   (`Status`);
-CREATE INDEX `idx_labrequest_status`   ON `LabRequest`   (`Status`);
-CREATE INDEX `idx_courtsummons_status` ON `CourtSummons` (`Status`);
-CREATE INDEX `idx_specimen_type`       ON `Specimen`     (`SpecimenType`);
+CREATE INDEX `idx_case_status`       ON `Case_Table` (`Status`);
+CREATE INDEX `idx_labrequest_status` ON `LabRequest`  (`Status`);
+CREATE INDEX `idx_specimen_type`     ON `Specimen`    (`SpecimenType`);
 
 
 -- ==========================================
