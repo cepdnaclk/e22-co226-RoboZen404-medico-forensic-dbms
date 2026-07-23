@@ -120,13 +120,13 @@ INSERT INTO Case_Table (CaseID, CaseDate, Status) VALUES
 (10, "2026-07-22", 'Open');
 
 -- Clinical Cases
-INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, WardID, PoliceStationID, MLEF_No, AdmissionDate) VALUES
-(1, 1, 1, 1, 1, 'MLEF/2026/001', '2026-06-10 09:30:00'),
-(2, 2, 2, 3, 1, 'MLEF/2026/002', '2026-06-20 14:15:00'),
-(5, 5, 1, 2, 4, 'MLEF/2026/003', '2026-07-10 11:00:00'),
-(6, 6, 2, 1, 1, 'MLEF/2026/004', '2026-07-15 16:45:00'),
-(7, 7, 1, 1, 1, 'MLEF/2026/005', '2026-07-18 09:15:00'),
-(8, 8, 2, 2, 1, 'MLEF/2026/006', '2026-07-19 14:30:00');
+INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, PoliceStationID, MLEF_No, AdmissionDate) VALUES
+(1, 1, 1, 1, 'MLEF/2026/001', '2026-06-10 09:30:00'),
+(2, 2, 2, 1, 'MLEF/2026/002', '2026-06-20 14:15:00'),
+(5, 5, 1, 4, 'MLEF/2026/003', '2026-07-10 11:00:00'),
+(6, 6, 2, 1, 'MLEF/2026/004', '2026-07-15 16:45:00'),
+(7, 7, 1, 1, 'MLEF/2026/005', '2026-07-18 09:15:00'),
+(8, 8, 2, 1, 'MLEF/2026/006', '2026-07-19 14:30:00');
 
 -- Autopsy Cases
 INSERT INTO AutopsyCase (AutopsyCaseID, DeceasedID, JMO_StaffID, PM_No, PlaceOfDeath, AutopsyDate) VALUES
@@ -212,3 +212,50 @@ INSERT INTO AuditLog (UserID, Action, TableName, RecordID) VALUES
 (2, 'Created clinical case MLEF/2026/001', 'ClinicalCase', 1),
 (2, 'Created autopsy case PM/2026/001', 'AutopsyCase', 3),
 (1, 'System initialized with seed data', 'System', 0);
+
+
+-- ==========================================
+-- 1. COMPREHENSIVE CLINICAL CASE (MLR/MLEF)
+-- ==========================================
+-- Variables
+SET @JMO_STAFF_ID = 2; -- Dr. Nimal Bandara
+SET @POLICE_STATION_ID = 1; -- Kandy Police Station
+
+-- Create Person
+INSERT INTO Person (FirstName, LastName, NIC, DOB, Gender) 
+VALUES ('John', 'Doe', CONCAT(FLOOR(RAND() * 900000000 + 100000000), 'V'), '1995-05-15', 'Male');
+SET @PERSON_ID_1 = LAST_INSERT_ID();
+
+-- Create Patient
+INSERT INTO Patient (PatientID, Address, EmergencyContact) 
+VALUES (@PERSON_ID_1, '123 Kandy Road, Peradeniya', '0771234567');
+SET @PATIENT_ID_1 = LAST_INSERT_ID();
+
+-- Create Case Record
+INSERT INTO Case_Table (CaseDate, Status) 
+VALUES (CURDATE(), 'Open');
+SET @CASE_ID_1 = LAST_INSERT_ID();
+
+-- Create Clinical Case
+INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, PoliceStationID, MLEF_No, AdmissionDate, DateOfIssue, ReasonForExamination, PoliceOfficerName, PoliceOfficerRank, PoliceOfficerRegNo) 
+VALUES (@CASE_ID_1, @PATIENT_ID_1, @JMO_STAFF_ID, @POLICE_STATION_ID, CONCAT('MLEF/2026/', FLOOR(RAND() * 10000)), DATE_SUB(NOW(), INTERVAL 2 DAY), NOW(), 'Patient complains of severe assault by multiple individuals using blunt and sharp weapons at a local bar.', 'Saman Silva', 'Sergeant', '67890');
+
+-- Add Injuries
+INSERT INTO Injury (CaseID, Type, Dimensions, Location, Description) VALUES 
+(@CASE_ID_1, 'Laceration', '6cm x 2cm', 'Left Parietal Scalp', 'Deep laceration exposing the skull bone. Bleeding profusely upon admission.'),
+(@CASE_ID_1, 'Contusion', '10cm x 8cm', 'Right Lateral Chest', 'Large bluish-purple bruise consistent with a heavy blunt force impact. Patient complains of pain on breathing.'),
+(@CASE_ID_1, 'Abrasion', '4cm x 4cm', 'Both Knees', 'Irregular grazing of the skin with gravel embedded.'),
+(@CASE_ID_1, 'Stab', '2.5cm x 0.5cm', 'Left Upper Arm', 'Clean cut stab wound, 4cm deep. Margins are regular. No major blood vessels damaged.'),
+(@CASE_ID_1, 'Bite', '3cm diameter', 'Right Forearm', 'Semi-circular bite mark with distinct tooth impressions. Swelling present.');
+
+-- Add Intoxication
+INSERT INTO IntoxicationRecord (CaseID, SubstanceType, Consumed, UnderInfluence) 
+VALUES (@CASE_ID_1, 'Alcohol', 1, 1);
+
+-- Add Part B Details (Medical Officer details)
+INSERT INTO MLEF_PartB_Details (ClinicalCaseID, ProducedBy, ExaminationDate, ExaminationPlace, DischargeDate, CausativeWeapon, CategoryOfHurt, EndangersLife, Investigations, Referrals, Recommendations, Remarks)
+VALUES (@CASE_ID_1, 'Sergeant Saman Silva', DATE_SUB(NOW(), INTERVAL 2 DAY), 'Trauma Unit - Bed 3', DATE_SUB(NOW(), INTERVAL 1 DAY), 'Blunt and Sharp', 'Grievous', 0, 'X-Ray Chest (No rib fractures). CT Head (Normal, no intracranial hemorrhage).', 'Referred to Surgical Unit for suturing.', 'Rest for 7 days. Antibiotics prescribed.', 'The injuries are highly consistent with the history of assault given by the patient. The scalp wound is grievous due to disfigurement.');
+
+-- Issue Court Report (MLR)
+INSERT INTO CourtReport (CaseID, ReportType, SignedByStaffID, IssueDate) 
+VALUES (@CASE_ID_1, 'MLR', @JMO_STAFF_ID, NOW());
