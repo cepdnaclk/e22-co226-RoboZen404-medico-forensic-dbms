@@ -31,5 +31,7 @@
             "email": "email@eng.pdn.ac.lk"
         }
     ],
-    "tags": []
+    "tags": ["Database Systems", "Web"],
+    "image":"cover_page.jpg",
+    "thumbnail":"thumbnail.jpg"
 }
