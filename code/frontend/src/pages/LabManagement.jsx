@@ -9,6 +9,13 @@ export default function LabManagement() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [toast, setToast] = useState('');
+  const [viewSpecimen, setViewSpecimen] = useState(null);
+  
+  // States for Lab Result Editing
+  const [isEditingResult, setIsEditingResult] = useState(false);
+  const [resultDetails, setResultDetails] = useState('');
+  const [receivedDate, setReceivedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [resultFile, setResultFile] = useState(null);
   
   const [form, setForm] = useState({
     caseId: '', specimenType: '', collectedDate: new Date().toISOString().split('T')[0],
@@ -18,10 +25,10 @@ export default function LabManagement() {
   const load = async () => {
     try {
       const [data, clinicalCases, autopsyCases, auths] = await Promise.all([
-        api.getSpecimens(),
-        api.getClinicalCases(),
-        api.getAutopsyCases(),
-        api.getAuthorities()
+        api.getSpecimens().catch(e => { console.error('Specimens err:', e); return []; }),
+        api.getClinicalCases().catch(e => { console.error('Clinical err:', e); return []; }),
+        api.getAutopsyCases().catch(e => { console.error('Autopsy err:', e); return []; }),
+        api.getAuthorities().catch(e => { console.error('Auths err:', e); return []; })
       ]);
       setSpecimens(data.sort((a,b) => b.SpecimenID - a.SpecimenID));
       setCases([...clinicalCases.map(c => ({ id: c.ClinicalCaseID, label: `Clinical: ${c.MLEF_No}` })), 
@@ -66,7 +73,7 @@ export default function LabManagement() {
       <div className="card table-card">
         <div style={{ padding: '1.5rem 1.5rem 1rem' }}><h2 style={{ fontSize: '1.125rem', fontWeight: 600 }}>All Specimens</h2></div>
         <table>
-          <thead><tr><th>Specimen ID</th><th>Case Ref</th><th>Collected</th><th>Case Status</th><th>Lab</th><th>Lab Status</th></tr></thead>
+          <thead><tr><th>Specimen ID</th><th>Case Ref</th><th>Collected</th><th>Case Status</th><th>Lab</th><th>Lab Status</th><th style={{ textAlign: 'right' }}>Action</th></tr></thead>
           <tbody>
             {specimens.length === 0 ? (
               <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--tertiary-label)', padding: '2rem' }}>No specimens recorded yet.</td></tr>
@@ -78,6 +85,15 @@ export default function LabManagement() {
                 <td><span className={`badge ${s.CaseStatus?.toLowerCase()}`}>{s.CaseStatus}</span></td>
                 <td>{s.LabName || 'Not sent'}</td>
                 <td>{s.LabStatus ? <span className={`badge ${s.LabStatus?.toLowerCase()}`}>{s.LabStatus}</span> : <span style={{ color: 'var(--tertiary-label)', fontSize: '0.8125rem' }}>No request</span>}</td>
+                <td style={{ textAlign: 'right' }}>
+                  <button className="btn btn-soft btn-sm" onClick={() => {
+                    setViewSpecimen(s);
+                    setIsEditingResult(false);
+                    setResultDetails(s.ResultDetails || '');
+                    setReceivedDate(s.ReceivedDate ? new Date(s.ReceivedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+                    setResultFile(null);
+                  }}>View</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -139,6 +155,94 @@ export default function LabManagement() {
                 <button type="submit" className="btn btn-primary">Save Specimen</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {viewSpecimen && (
+        <div className="modal-overlay" onClick={() => setViewSpecimen(null)}>
+          <div className="modal" style={{ maxWidth: '600px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Specimen SP-{viewSpecimen.SpecimenID} Details</h2>
+              <button onClick={() => setViewSpecimen(null)}><X size={14} /></button>
+            </div>
+            <div className="modal-body">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {!isEditingResult && (
+                  <div className="card detail-section" style={{ margin: 0 }}>
+                    <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--tertiary-label)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1rem' }}>Specimen Information</h3>
+                    <div className="detail-row"><span className="label">Case Reference</span><span className="value">{viewSpecimen.CaseReference || 'N/A'}</span></div>
+                    <div className="detail-row"><span className="label">Specimen Type</span><span className="value">{viewSpecimen.SpecimenType || 'N/A'}</span></div>
+                    <div className="detail-row"><span className="label">Collected Date</span><span className="value">{viewSpecimen.CollectedDate ? new Date(viewSpecimen.CollectedDate).toLocaleDateString() : 'N/A'}</span></div>
+                    <div className="detail-row"><span className="label">Storage Location</span><span className="value">{viewSpecimen.StorageLocation || 'N/A'}</span></div>
+                  </div>
+                )}
+                <div className="card detail-section" style={{ margin: 0 }}>
+                  <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--tertiary-label)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1rem' }}>Lab Request</h3>
+                  <div className="detail-row"><span className="label">Target Lab</span><span className="value">{viewSpecimen.LabName || 'Not Sent'}</span></div>
+                  <div className="detail-row"><span className="label">Status</span><span className="value">{viewSpecimen.LabStatus ? <span className={`badge ${viewSpecimen.LabStatus?.toLowerCase()}`}>{viewSpecimen.LabStatus}</span> : 'No request'}</span></div>
+                  {viewSpecimen.AnalysisRequired && (
+                    <div className="detail-row"><span className="label">Analysis Req.</span><span className="value" style={{ whiteSpace: 'pre-wrap' }}>{viewSpecimen.AnalysisRequired}</span></div>
+                  )}
+                </div>
+                
+                {isEditingResult ? (
+                  <div className="card detail-section" style={{ margin: 0 }}>
+                    <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--tertiary-label)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1rem' }}>Update Lab Results</h3>
+                    <div className="form-group">
+                      <label className="form-label">Received Date</label>
+                      <input type="date" className="form-input" value={receivedDate} onChange={e => setReceivedDate(e.target.value)} required />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Result Details</label>
+                      <textarea className="form-input" value={resultDetails} onChange={e => setResultDetails(e.target.value)} rows={4} placeholder="Enter the findings/results returned by the lab..." required />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Attachment (Optional)</label>
+                      <input type="file" className="form-input" onChange={e => setResultFile(e.target.files[0])} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '1rem' }}>
+                      <button className="btn btn-primary btn-sm" onClick={async () => {
+                        try {
+                          await api.updateLabResult(viewSpecimen.RequestID, resultDetails, receivedDate, resultFile);
+                          setToast('Lab result updated successfully');
+                          setIsEditingResult(false);
+                          setViewSpecimen(null);
+                          load();
+                          setTimeout(() => setToast(''), 3000);
+                        } catch (err) {
+                          setToast(err.message);
+                          setTimeout(() => setToast(''), 3000);
+                        }
+                      }}>Mark as Completed</button>
+                      <button className="btn btn-secondary btn-sm" onClick={() => setIsEditingResult(false)}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  viewSpecimen.ResultDetails && (
+                    <div className="card detail-section" style={{ margin: 0 }}>
+                      <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--tertiary-label)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '1rem' }}>Lab Results</h3>
+                      <div className="detail-row"><span className="label">Received Date</span><span className="value">{viewSpecimen.ReceivedDate ? new Date(viewSpecimen.ReceivedDate).toLocaleDateString() : 'N/A'}</span></div>
+                      <div className="detail-row" style={{ alignItems: 'flex-start', marginTop: '0.5rem' }}><span className="label">Result Details</span><span className="value" style={{ whiteSpace: 'pre-wrap' }}>{viewSpecimen.ResultDetails}</span></div>
+                      {viewSpecimen.AttachmentPath && (
+                         <div className="detail-row" style={{ marginTop: '0.5rem' }}>
+                           <span className="label">Attachment</span>
+                           <span className="value"><a href={`http://localhost:5001/${viewSpecimen.AttachmentPath}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 500 }}>View Attachment</a></span>
+                         </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div>
+                {canEdit && viewSpecimen.RequestID && !isEditingResult && (
+                  <button className="btn btn-secondary" onClick={() => setIsEditingResult(true)}>Edit Results</button>
+                )}
+              </div>
+              <button className="btn btn-soft" onClick={() => setViewSpecimen(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}
