@@ -1,8 +1,9 @@
+---
 layout: home
 permalink: index.html
 
-repository-name: e22-co2050-Forensic-Medicine-DBMS
-title: Medico Forensic DBMS
+repository-name: e22-co226-RoboZen404-medico-forensic-dbms
+title: ForensicSys - Medico Forensic DBMS
 ---
 
 # Medico Forensic DBMS — Department of Forensic Medicine Management System
