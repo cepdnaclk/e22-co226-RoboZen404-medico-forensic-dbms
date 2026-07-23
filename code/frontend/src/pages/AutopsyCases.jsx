@@ -178,7 +178,8 @@ export default function AutopsyCases() {
           contributory: data.causeOfDeath?.ContributoryCause || '',
           maternalDeath: data.causeOfDeath?.MaternalDeath || 'None',
           comments: data.causeOfDeath?.Comments || ''
-        }
+        },
+        identifiedBy: data.IdentifiedBy || ''
       });
     } catch (err) { setToast(err.message); setTimeout(() => setToast(''), 3000); }
   };
@@ -222,8 +223,11 @@ export default function AutopsyCases() {
   const handleUpdateReport = async (e) => {
     e.preventDefault();
     try {
-      await api.updateAutopsyFindings(showDetail.AutopsyCaseID, { causeOfDeath: findingsForm.causeOfDeath });
-      setToast('Cause of Death updated successfully');
+      await api.updateAutopsyFindings(showDetail.AutopsyCaseID, { 
+        causeOfDeath: findingsForm.causeOfDeath,
+        identifiedBy: findingsForm.identifiedBy 
+      });
+      setToast('Report updated successfully');
       setTimeout(() => setToast(''), 3000);
       setReportFormMode(null);
       viewDetail(showDetail.AutopsyCaseID);
@@ -253,12 +257,8 @@ export default function AutopsyCases() {
     <div className="animate-in">
       {showDetail && (
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div ref={pmrRef} style={{ width: '210mm', backgroundColor: 'white', padding: '20mm' }}>
-            <PMRTemplate report={showDetail} caseDetail={showDetail} extraDetails={showDetail.internalExamination} />
-          </div>
-          <div ref={examRef} style={{ width: '210mm', backgroundColor: 'white', padding: '20mm' }}>
-            <ExaminationTemplate caseDetail={showDetail} internalExam={showDetail.internalExamination} />
-          </div>
+          <PMRTemplate ref={pmrRef} report={showDetail} caseDetail={showDetail} extraDetails={showDetail.internalExamination} />
+          <ExaminationTemplate ref={examRef} caseDetail={showDetail} internalExam={showDetail.internalExamination} />
         </div>
       )}
       <div className="section-header">
@@ -473,11 +473,11 @@ export default function AutopsyCases() {
                     <div className="form-group"><label className="form-label">Date of Death</label><input className="form-input" defaultValue={showDetail.DateOfDeath ? new Date(showDetail.DateOfDeath).toLocaleDateString() : ''} disabled /></div>
                     <div className="form-group"><label className="form-label">JMO Conducting Autopsy</label><input className="form-input" defaultValue={showDetail.JMOName} disabled /></div>
                     
-                    <div className="form-group"><label className="form-label">Requesting Person</label><input className="form-input" defaultValue={showDetail.inquestOrder?.AuthName || ''} disabled /></div>
-                    <div className="form-group"><label className="form-label">Court</label><input className="form-input" defaultValue={showDetail.inquestOrder?.AuthType === 'Magistrate' ? 'Magistrate Court' : ''} disabled /></div>
+                    <div className="form-group"><label className="form-label">Requesting Person</label><input className="form-input" defaultValue={showDetail.inquestOrder?.AuthorityName || ''} disabled /></div>
+                    <div className="form-group"><label className="form-label">Court</label><input className="form-input" defaultValue={showDetail.inquestOrder?.AuthorityType === 'Court' ? 'Magistrate Court' : showDetail.inquestOrder?.AuthorityType || ''} disabled /></div>
 
                     <div className="form-group"><label className="form-label">Place of Examination</label><input className="form-input" defaultValue="Teaching Hospital Peradeniya" /></div>
-                    <div className="form-group"><label className="form-label">Identified By</label><input className="form-input" placeholder="Names of persons who identified body" /></div>
+                    <div className="form-group"><label className="form-label">Identified By</label><input className="form-input" placeholder="Names of persons who identified body" value={findingsForm.identifiedBy || ''} onChange={e => setFindingsForm({...findingsForm, identifiedBy: e.target.value})} /></div>
                   </div>
                 </div>
 

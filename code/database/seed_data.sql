@@ -127,11 +127,11 @@ INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, PoliceStationI
 (8, 8, 2, 1, 'MLEF/2026/006', '2026-07-19 14:30:00');
 
 -- Autopsy Cases
-INSERT INTO AutopsyCase (AutopsyCaseID, DeceasedID, JMO_StaffID, PM_No, PlaceOfDeath, AutopsyDate) VALUES
-(3, 3, 1, 'PM/2026/001', 'Mahaweli River, Peradeniya', '2026-06-16 10:00:00'),
-(4, 4, 2, 'PM/2026/002', 'Residence, 56 Dalada Veediya', '2026-07-02 09:00:00'),
-(9, 9, 2, 'PM/2026/003', 'Roadside, Katugastota', '2026-07-20 11:00:00'),
-(10, 10, 2, 'PM/2026/004', 'General Hospital Ward 3', '2026-07-21 14:00:00');
+INSERT INTO AutopsyCase (AutopsyCaseID, DeceasedID, JMO_StaffID, PM_No, PlaceOfDeath, IdentifiedBy, AutopsyDate) VALUES
+(3, 3, 1, 'PM/2026/001', 'Mahaweli River, Peradeniya', 'Wife: Sunethra Perera', '2026-06-16 10:00:00'),
+(4, 4, 2, 'PM/2026/002', 'Residence, 56 Dalada Veediya', 'Brother: Nimal Silva', '2026-07-02 09:00:00'),
+(9, 9, 2, 'PM/2026/003', 'Roadside, Katugastota', NULL, '2026-07-20 11:00:00'),
+(10, 10, 2, 'PM/2026/004', 'General Hospital Ward 3', 'Son: Kasun Bandara', '2026-07-21 14:00:00');
 
 -- Injuries
 INSERT INTO Injury (CaseID, Type, Dimensions, Location, Description) VALUES

@@ -1,39 +1,45 @@
-# Medico-Forensic DBMS 🏥🔍
+# 🏥 Medico Forensic Database Management System (MFDBMS)
 
-A comprehensive database management system designed to streamline and digitize the workflows of forensic medical departments. This system effectively manages clinical cases, autopsies, court reports, and laboratory evidence, replacing outdated paper-based procedures.
+A professional, full stack database management system meticulously engineered to digitalize and streamline the intricate workflows of forensic medical departments. This system robustly manages clinical cases, autopsies, court reports, and laboratory evidence, replacing antiquated paper based procedures with a secure, highly responsive digital solution.
 
-## 🚀 Key Features
+## ✨ Key Features & Capabilities
 
-* **Clinical & Autopsy Case Management:** Securely log and track patient cases, injuries, and post-mortem examinations.
-* **Automated Court Reports:** Generate standardized Medico-Legal Examination Forms (MLEF) and Post-Mortem Reports (PMR) in ready-to-print PDF formats.
-* **Laboratory Tracking:** Manage evidence, specimen storage, and lab requests seamlessly.
-* **Real-time Dashboard:** Track active cases, pending lab reports, and upcoming court summons at a glance.
-* **Role-Based Access Control:** Secure access levels tailored for JMOs, Medical Officers, and Lab Technicians.
+* **Comprehensive Case Management:** Securely log and track both clinical and autopsy cases with deep data relational integrity.
+* **Dynamic Internal Examinations:** Leverages advanced JSON structures to dynamically capture complex anatomical findings and forensic measurements.
+* **Automated Court Report Generation:** Programmatically generate pixel perfect, standardized PDFs including Medico Legal Examination Forms (MLEF), Medico Legal Reports (MLR), Post Mortem Reports (PMR), and Detailed Internal Examination Reports.
+* **Smart Notification System:** Real time dashboard notifications that instantly alert the relevant JMOs and medical staff when new cases are assigned to them.
+* **Laboratory Evidence Tracking:** Manage forensic evidence, specimen storage, and lab requests seamlessly.
+* **Secure Attachment Handling:** Direct file upload integration allowing lab staff to securely attach laboratory results and digital evidence to case files.
+* **Real time Analytical Dashboard:** Instantly track active cases, pending lab reports, and upcoming court summons with interactive data visualization.
+* **Role Based Access Control (RBAC):** Secure access levels specifically tailored for Judicial Medical Officers (JMOs), Medical Officers, and Lab Technicians.
+* **Premium User Interface:** A highly polished, aesthetic, and responsive user experience built with modern glassmorphic design principles and interactive micro animations.
 
-## 💻 Tech Stack
+## 💻 Technology Stack
 
-* **Frontend:** React, Vite, Lucide Icons
-* **Backend:** Node.js, Express.js
-* **Database:** MySQL
-* **Tools:** html2canvas, jsPDF (for report generation)
+* **Frontend:** React, Vite, Recharts, Lucide Icons
+* **Backend:** Node.js, Express.js, Multer (for file uploads)
+* **Database:** MySQL (Structured Relational Data & Native JSON)
+* **Document Generation:** html2canvas, jsPDF
 
----
+***
 
 ## 🛠️ Local Development Setup Guide
 
 If you are a team member pulling this repository, please follow these steps to set up the project locally.
 
-### 1. Database Setup
-The database schema is included in this repository.
+### 1. Database Initialization
+
+The database schema and relational structures are included in this repository.
 
 1. Open **MySQL Workbench** or your preferred MySQL client.
-2. Run the main schema file to create the tables: 
+2. Run the main schema file to create the tables:
    👉 `code/database/ForensicSys.sql`
-3. Run the seed data script to populate the system with dummy data for testing: 
+3. Run the seed data script to populate the system with dummy data for testing:
    👉 `code/database/seed_data.sql`
 
-### 2. Backend Setup
-1. Open a terminal and navigate to the backend folder:
+### 2. Backend Configuration
+
+1. Open a terminal and navigate to the backend directory:
    ```bash
    cd code/backend
    ```
@@ -54,8 +60,9 @@ The database schema is included in this repository.
    node server.js
    ```
 
-### 3. Frontend Setup
-1. Open a second terminal window and navigate to the frontend folder:
+### 3. Frontend Initialization
+
+1. Open a second terminal window and navigate to the frontend directory:
    ```bash
    cd code/frontend
    ```
@@ -67,4 +74,4 @@ The database schema is included in this repository.
    ```bash
    npm run dev
    ```
-4. The application will be available at `http://localhost:5173`.
+4. The application will be immediately available at `http://localhost:5173`.

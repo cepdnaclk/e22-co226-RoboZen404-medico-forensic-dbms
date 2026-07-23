@@ -19,11 +19,11 @@ const FullAutopsyReportTemplate = forwardRef(({ report, caseDetail }, ref) => {
   };
 
   const SectionHeader = ({ title }) => (
-    <div style={{ 
-      backgroundColor: '#f3f4f6', 
-      padding: '8px 12px', 
-      fontWeight: 'bold', 
-      fontSize: '12px', 
+    <div style={{
+      backgroundColor: '#f3f4f6',
+      padding: '8px 12px',
+      fontWeight: 'bold',
+      fontSize: '12px',
       color: '#1f2937',
       borderBottom: '2px solid #1f2937',
       letterSpacing: '0.5px',
@@ -127,7 +127,7 @@ const FullAutopsyReportTemplate = forwardRef(({ report, caseDetail }, ref) => {
                 <td style={{ padding: '8px', borderBottom: '1px solid #e5e7eb' }}>{spec.LabName || spec.StorageLocation}</td>
                 <td style={{ padding: '8px', borderBottom: '1px solid #e5e7eb' }}>
                   {spec.ResultDetails ? (
-                    <span>{spec.ResultDetails} <br/><span style={{ fontSize: '9px', color: '#6b7280' }}>Received: {new Date(spec.ReceivedDate).toLocaleDateString()}</span></span>
+                    <span>{spec.ResultDetails} <br /><span style={{ fontSize: '9px', color: '#6b7280' }}>Received: {new Date(spec.ReceivedDate).toLocaleDateString()}</span></span>
                   ) : (
                     <span style={{ color: '#d97706', fontStyle: 'italic' }}>{spec.LabStatus || 'Pending'}</span>
                   )}
@@ -156,13 +156,13 @@ const FullAutopsyReportTemplate = forwardRef(({ report, caseDetail }, ref) => {
           <div style={{ width: '150px', fontWeight: 'bold', fontSize: '11px', color: '#4b5563' }}>Contributory (II):</div>
           <div style={{ flex: 1, fontSize: '12px', textTransform: 'uppercase' }}>{causeOfDeath.ContributoryCause || '---'}</div>
         </div>
-        
+
         {causeOfDeath.MaternalDeath && causeOfDeath.MaternalDeath !== 'None' && (
           <div style={{ marginBottom: '10px', fontSize: '11px', color: '#dc2626', fontWeight: 'bold' }}>
             * Maternal Death: Yes ({causeOfDeath.MaternalDeath})
           </div>
         )}
-        
+
         {causeOfDeath.Comments && (
           <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #d1d5db', fontSize: '11px' }}>
             <span style={{ fontWeight: 'bold', color: '#4b5563' }}>Comments & Opinions: </span>
@@ -180,7 +180,7 @@ const FullAutopsyReportTemplate = forwardRef(({ report, caseDetail }, ref) => {
           <div style={{ fontSize: '9px', color: '#6b7280', marginTop: '3px' }}>Signature & Official Stamp</div>
         </div>
       </div>
-      
+
     </div>
   );
 });

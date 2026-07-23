@@ -94,6 +94,12 @@ router.get('/:id', verifyToken, async (req, res) => {
 router.post('/', verifyToken, async (req, res) => {
     const { patientId, jmoStaffId, policeStationId, mlefNo, admissionDate, dateOfIssue, reasonForExamination, policeOfficerName, policeOfficerRank, policeOfficerRegNo, injuries, intoxication } = req.body;
     const conn = await pool.getConnection();
+    const toMySQLDate = (d) => {
+        if (!d) return null;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return null;
+        return dt.toISOString().slice(0, 19).replace('T', ' ');
+    };
     try {
         await conn.beginTransaction();
 
@@ -104,7 +110,7 @@ router.post('/', verifyToken, async (req, res) => {
 
         await conn.query(
             'INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, PoliceStationID, MLEF_No, AdmissionDate, DateOfIssue, ReasonForExamination, PoliceOfficerName, PoliceOfficerRank, PoliceOfficerRegNo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [caseId, patientId, jmoStaffId, policeStationId || null, mlefNo, admissionDate || null, dateOfIssue || null, reasonForExamination || null, policeOfficerName || null, policeOfficerRank || null, policeOfficerRegNo || null]
+            [caseId, patientId, jmoStaffId, policeStationId || null, mlefNo, toMySQLDate(admissionDate), toMySQLDate(dateOfIssue), reasonForExamination || null, policeOfficerName || null, policeOfficerRank || null, policeOfficerRegNo || null]
         );
 
         if (injuries && injuries.length > 0) {
@@ -204,8 +210,15 @@ router.put('/:id/findings', verifyToken, async (req, res) => {
 
         // Update MLEF Part B Details
         if (partB) {
-            const examDate = partB.examinationDate ? partB.examinationDate : null;
-            const disDate = partB.dischargeDate ? partB.dischargeDate : null;
+            const toMySQLDate = (d) => {
+                if (!d) return null;
+                // Handle ISO strings with Z suffix that MySQL can't parse
+                const dt = new Date(d);
+                if (isNaN(dt.getTime())) return null;
+                return dt.toISOString().slice(0, 19).replace('T', ' ');
+            };
+            const examDate = toMySQLDate(partB.examinationDate);
+            const disDate = toMySQLDate(partB.dischargeDate);
             const [existingPartB] = await conn.query('SELECT DetailID FROM MLEF_PartB_Details WHERE ClinicalCaseID = ?', [caseId]);
             if (existingPartB.length > 0) {
                 await conn.query(

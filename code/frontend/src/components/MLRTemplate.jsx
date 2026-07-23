@@ -3,27 +3,11 @@ import React, { forwardRef } from 'react';
 const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
   if (!report || !caseDetail) return null;
 
-  const partB = caseDetail.partB || {
-    ExaminationPlace: 'OPD - Room 4',
-    ExaminationDate: new Date().toISOString(),
-    DischargeDate: new Date(Date.now() + 86400000).toISOString(),
-    Investigations: 'X-Ray of left forearm (No fractures). CT Brain (Normal).',
-    CategoryOfHurt: 'Grievous',
-    EndangersLife: 0,
-    CausativeWeapon: 'Blunt',
-    Remarks: 'Injuries are consistent with an assault as described by the patient. No defensive wounds noted.'
-  };
+  const partB = caseDetail.partB || {};
 
-  const intoxicationRecords = caseDetail.intoxicationRecords?.length > 0 ? caseDetail.intoxicationRecords : [
-    { SubstanceType: 'Alcohol', Consumed: true, UnderInfluence: false }
-  ];
+  const intoxicationRecords = caseDetail.intoxicationRecords || [];
 
-  const injuries = caseDetail.injuries?.length > 0 ? caseDetail.injuries : [
-    { Type: 'Laceration', Dimensions: '5cm x 2cm', Location: 'Left forearm', Description: 'Irregular wound with bruised edges.' },
-    { Type: 'Abrasion', Dimensions: '3cm x 3cm', Location: 'Right knee', Description: 'Superficial scraping of skin.' },
-    { Type: 'Contusion', Dimensions: '4cm x 4cm', Location: 'Left temple', Description: 'Bluish discoloration with swelling.' },
-    { Type: 'Stab', Dimensions: '2cm x 0.5cm', Location: 'Left shoulder', Description: 'Clean cut wound.' }
-  ];
+  const injuries = caseDetail.injuries || [];
 
   const pageStyle = {
     width: '210mm',
@@ -37,11 +21,11 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
   };
 
   const SectionHeader = ({ title }) => (
-    <div style={{ 
-      backgroundColor: '#f3f4f6', 
-      padding: '6px 10px', 
-      fontWeight: 'bold', 
-      fontSize: '11px', 
+    <div style={{
+      backgroundColor: '#f3f4f6',
+      padding: '6px 10px',
+      fontWeight: 'bold',
+      fontSize: '11px',
       color: '#1f2937',
       borderBottom: '1.5px solid #1f2937',
       letterSpacing: '0.5px'
@@ -73,7 +57,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
       {/* PAGE 1 */}
       <div style={pageStyle}>
         <div style={{ position: 'absolute', top: '10mm', right: '10mm', textAlign: 'right', fontSize: '9px', color: '#9ca3af' }}>
-          Health 1135<br/>(F*S., T. & E.) 04/ 76
+          Health 1135<br />(F*S., T. & E.) 04/ 76
         </div>
 
         <div style={{ textAlign: 'center', marginBottom: '20px', marginTop: '10px' }}>
@@ -101,7 +85,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
 
         <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px' }}>
           <SectionHeader title="A. IDENTIFICATION" />
-          
+
           <div style={{ ...cellStyle, ...borderBottom }}>
             <span style={labelStyle}>Full Name</span>
             <span style={valueStyle}>{caseDetail.PatientName}</span>
@@ -134,7 +118,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
             </div>
             <div style={{ flex: 1, ...cellStyle }}>
               <span style={labelStyle}>Time</span>
-              <span style={valueStyle}>{partB?.ExaminationDate ? new Date(partB.ExaminationDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+              <span style={valueStyle}>{partB?.ExaminationDate ? new Date(partB.ExaminationDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
             </div>
           </div>
 
@@ -145,7 +129,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
             </div>
             <div style={{ flex: 1, ...cellStyle }}>
               <span style={labelStyle}>Time</span>
-              <span style={valueStyle}>{caseDetail.AdmissionDate ? new Date(caseDetail.AdmissionDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+              <span style={valueStyle}>{caseDetail.AdmissionDate ? new Date(caseDetail.AdmissionDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</span>
             </div>
           </div>
 
@@ -172,7 +156,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
       {/* PAGE 2 */}
       <div style={pageStyle}>
         <div style={{ textAlign: 'center', marginBottom: '15px', fontSize: '10px', color: '#6b7280', fontWeight: 'bold' }}>— PAGE 2 —</div>
-        
+
         <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px' }}>
           <SectionHeader title="C. INJURIES" />
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -204,11 +188,11 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
 
         <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden' }}>
           <SectionHeader title="D. OPINION" />
-          
+
           <div style={{ display: 'flex', ...borderBottom, padding: '8px 12px', alignItems: 'center' }}>
             <div style={{ width: '250px', fontSize: '10px', color: '#4b5563', fontWeight: 'bold' }}>1. Non-grievous injuries (Nos.)</div>
             <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>
-              {partB?.CategoryOfHurt === 'Non-grievous' ? injuries.map((_,i)=>i+1).join(', ') : 'None'}
+              {partB?.CategoryOfHurt === 'Non-grievous' ? injuries.map((_, i) => i + 1).join(', ') : 'None'}
             </div>
           </div>
 
@@ -222,7 +206,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
             </thead>
             <tbody>
               <tr style={{ height: '40px' }}>
-                <td style={{ padding: '8px', ...borderRight, fontSize: '11px', fontWeight: 'bold' }}>{partB?.CategoryOfHurt === 'Grievous' ? injuries.map((_,i)=>i+1).join(', ') : ''}</td>
+                <td style={{ padding: '8px', ...borderRight, fontSize: '11px', fontWeight: 'bold' }}>{partB?.CategoryOfHurt === 'Grievous' ? injuries.map((_, i) => i + 1).join(', ') : ''}</td>
                 <td style={{ padding: '8px', ...borderRight }}></td>
                 <td style={{ padding: '8px' }}></td>
               </tr>
@@ -232,7 +216,7 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           <div style={{ display: 'flex', padding: '8px 12px', alignItems: 'center' }}>
             <div style={{ width: '400px', fontSize: '10px', color: '#4b5563', fontWeight: 'bold' }}>3. Injuries sufficient in the ordinary course of nature to cause death (Nos.)</div>
             <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>
-              {partB?.CategoryOfHurt === 'Fatal' || partB?.EndangersLife === 1 ? injuries.map((_,i)=>i+1).join(', ') : 'None'}
+              {partB?.CategoryOfHurt === 'Fatal' || partB?.EndangersLife === 1 ? injuries.map((_, i) => i + 1).join(', ') : 'None'}
             </div>
           </div>
         </div>
@@ -244,37 +228,37 @@ const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
 
         <div style={{ border: '1.5px solid #1f2937', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px' }}>
           <SectionHeader title="4. INJURIES CAUSED BY" />
-          
+
           <div style={{ display: 'flex', ...borderBottom, padding: '8px 12px' }}>
             <div style={{ width: '250px', fontSize: '11px', color: '#4b5563', fontWeight: 'bold' }}>(a) Blunt Weapon—Nos.</div>
-            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{partB?.CausativeWeapon === 'Blunt' ? injuries.map((_,i)=>i+1).join(', ') : ''}</div>
+            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{partB?.CausativeWeapon === 'Blunt' ? injuries.map((_, i) => i + 1).join(', ') : ''}</div>
           </div>
-          
+
           <div style={{ ...borderBottom, padding: '8px 12px' }}>
             <div style={{ fontSize: '11px', color: '#4b5563', fontWeight: 'bold', marginBottom: '8px' }}>(b) Sharp cutting instrument—</div>
             <div style={{ display: 'flex', paddingLeft: '20px', marginBottom: '4px' }}>
               <div style={{ width: '150px', fontSize: '11px', color: '#6b7280' }}>Cut—Nos.</div>
-              <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Cut' ? i+1 : null).filter(Boolean).join(', ')}</div>
+              <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Cut' ? i + 1 : null).filter(Boolean).join(', ')}</div>
             </div>
             <div style={{ display: 'flex', paddingLeft: '20px' }}>
               <div style={{ width: '150px', fontSize: '11px', color: '#6b7280' }}>Stab—Nos.</div>
-              <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Stab' ? i+1 : null).filter(Boolean).join(', ')}</div>
+              <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Stab' ? i + 1 : null).filter(Boolean).join(', ')}</div>
             </div>
           </div>
 
           <div style={{ display: 'flex', ...borderBottom, padding: '8px 12px' }}>
             <div style={{ width: '250px', fontSize: '11px', color: '#4b5563', fontWeight: 'bold' }}>(c) Firearms—Nos.</div>
-            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Firearm' || inj.Type === 'Firearm inj.' ? i+1 : null).filter(Boolean).join(', ')}</div>
+            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Firearm' || inj.Type === 'Firearm inj.' ? i + 1 : null).filter(Boolean).join(', ')}</div>
           </div>
 
           <div style={{ display: 'flex', ...borderBottom, padding: '8px 12px' }}>
             <div style={{ width: '250px', fontSize: '11px', color: '#4b5563', fontWeight: 'bold' }}>(d) Burns—Nos.</div>
-            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Burns' ? i+1 : null).filter(Boolean).join(', ')}</div>
+            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Burns' ? i + 1 : null).filter(Boolean).join(', ')}</div>
           </div>
 
           <div style={{ display: 'flex', padding: '8px 12px' }}>
             <div style={{ width: '250px', fontSize: '11px', color: '#4b5563', fontWeight: 'bold' }}>(e) Bite marks—Nos.</div>
-            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Bite' ? i+1 : null).filter(Boolean).join(', ')}</div>
+            <div style={{ flex: 1, fontSize: '11px', fontWeight: '600' }}>{injuries.map((inj, i) => inj.Type === 'Bite' ? i + 1 : null).filter(Boolean).join(', ')}</div>
           </div>
         </div>
 

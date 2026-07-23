@@ -26,11 +26,11 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
   };
 
   const SectionHeader = ({ title }) => (
-    <div style={{ 
-      backgroundColor: '#f3f4f6', 
-      padding: '8px 12px', 
-      fontWeight: 'bold', 
-      fontSize: '12px', 
+    <div style={{
+      backgroundColor: '#f3f4f6',
+      padding: '8px 12px',
+      fontWeight: 'bold',
+      fontSize: '12px',
       color: '#1f2937',
       borderBottom: '1.5px solid #1f2937',
       letterSpacing: '0.5px',
@@ -43,17 +43,20 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
   const cellStyle = {
     padding: '8px 12px',
     lineHeight: '1.5',
-    fontSize: '11px'
+    fontSize: '11px',
+    minWidth: 0,
+    wordWrap: 'break-word',
+    overflowWrap: 'break-word'
   };
 
   const borderRight = { borderRight: '1.5px solid #e5e7eb' };
   const borderBottom = { borderBottom: '1.5px solid #e5e7eb' };
-  const labelStyle = { color: '#6b7280', display: 'block', fontSize: '9px', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' };
-  const valueStyle = { color: '#111827', fontWeight: '600', fontSize: '12px' };
+  const labelStyle = { color: '#6b7280', display: 'block', fontSize: '9px', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', whiteSpace: 'normal' };
+  const valueStyle = { color: '#111827', fontWeight: '600', fontSize: '12px', whiteSpace: 'normal', wordWrap: 'break-word' };
 
   return (
     <div ref={ref} style={pageStyle}>
-      
+
       {/* Document Header */}
       <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #111827', paddingBottom: '15px' }}>
         <div style={{ fontSize: '11px', fontWeight: 'bold', position: 'absolute', right: '15mm', top: '15mm' }}>Health 14</div>
@@ -64,7 +67,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
       {/* Cover Page Details */}
       <div style={{ border: '1.5px solid #1f2937', marginBottom: '20px' }}>
         <SectionHeader title="Cover Page Details" />
-        
+
         <div style={{ display: 'flex', ...borderBottom }}>
           <div style={{ flex: 1, ...borderRight, ...cellStyle }}>
             <span style={labelStyle}>Inquest No.</span>
@@ -76,7 +79,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           </div>
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>Courts</span>
-            <span style={valueStyle}>{inquestOrder?.AuthType === 'Magistrate' ? 'Magistrate Court' : 'N/A'}</span>
+            <span style={valueStyle}>{inquestOrder?.AuthorityType === 'Court' ? 'Magistrate Court' : (inquestOrder?.AuthorityType || 'N/A')}</span>
           </div>
         </div>
 
@@ -102,7 +105,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>Date and time of Death, (if known)</span>
             <span style={valueStyle}>
-              {caseDetail.DateOfDeath ? new Date(caseDetail.DateOfDeath).toLocaleDateString() : 'N/A'} 
+              {caseDetail.DateOfDeath ? new Date(caseDetail.DateOfDeath).toLocaleDateString() : 'N/A'}
               {caseDetail.TimeOfDeath ? ` at ${caseDetail.TimeOfDeath}` : ''}
             </span>
           </div>
@@ -126,7 +129,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>Name and designation of the person who requested the Post-Mortem Examination</span>
             <span style={valueStyle}>
-              {inquestOrder ? `${inquestOrder.AuthorityName} (${inquestOrder.AuthType})` : 'N/A'}
+              {inquestOrder ? `${inquestOrder.AuthorityName} (${inquestOrder.AuthorityType})` : 'N/A'}
             </span>
           </div>
         </div>
@@ -145,7 +148,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
         <div style={{ display: 'flex' }}>
           <div style={{ flex: 1, ...cellStyle, minHeight: '60px' }}>
             <span style={labelStyle}>Names and Addresses of persons who identified the body</span>
-            <span style={valueStyle}></span>
+            <span style={valueStyle}>{caseDetail.IdentifiedBy || ''}</span>
           </div>
         </div>
       </div>
@@ -153,7 +156,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
       {/* Cause of Death */}
       <div style={{ border: '1.5px solid #1f2937', marginBottom: '20px' }}>
         <SectionHeader title="Cause of Death" />
-        
+
         <div style={{ display: 'flex', ...borderBottom }}>
           <div style={{ width: '150px', ...borderRight, ...cellStyle, backgroundColor: '#f9fafb' }}>
             <span style={labelStyle}>Immediate Cause</span>
@@ -217,11 +220,11 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>Judicial Medical Officer</div>
         </div>
       </div>
-      
-      <div style={{ 
-        position: 'absolute', 
-        bottom: '15mm', 
-        left: '15mm', 
+
+      <div style={{
+        position: 'absolute',
+        bottom: '15mm',
+        left: '15mm',
         right: '15mm',
         borderTop: '1px solid #e5e7eb',
         paddingTop: '8px',
