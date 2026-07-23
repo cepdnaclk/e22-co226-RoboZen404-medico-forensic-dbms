@@ -1,35 +1,19 @@
--- MySQL dump 10.13  Distrib 9.6.0, for macos26.3 (arm64)
---
--- Host: localhost    Database: ForensicMedicalDB
--- ------------------------------------------------------
--- Server version	9.6.0
+-- ==============================================================================
+-- Medico-Forensic DBMS - Database Schema
+-- ==============================================================================
+-- This script creates all the necessary tables, views, and relationships.
+-- Run this script to initialize a fresh database structure.
+-- ==============================================================================
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
-SET @@SESSION.SQL_LOG_BIN= 0;
+CREATE DATABASE IF NOT EXISTS `ForensicMedicalDB`;
+USE `ForensicMedicalDB`;
 
---
--- GTID state at the beginning of the backup 
---
-
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '449782e8-422e-11f1-8f5f-6fc17919110b:1-824';
-
---
--- Table structure for table `AuditLog`
---
+-- ==========================================
+-- 1. TABLES
+-- ==========================================
 
 DROP TABLE IF EXISTS `AuditLog`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `AuditLog` (
   `LogID` int NOT NULL AUTO_INCREMENT,
   `UserID` int NOT NULL,
@@ -41,15 +25,9 @@ CREATE TABLE `AuditLog` (
   KEY `UserID` (`UserID`),
   CONSTRAINT `auditlog_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `UserAccount` (`UserID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `AutopsyCase`
---
 
 DROP TABLE IF EXISTS `AutopsyCase`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `AutopsyCase` (
   `AutopsyCaseID` int NOT NULL,
   `DeceasedID` int NOT NULL,
@@ -65,15 +43,9 @@ CREATE TABLE `AutopsyCase` (
   CONSTRAINT `autopsycase_ibfk_2` FOREIGN KEY (`DeceasedID`) REFERENCES `Deceased` (`DeceasedID`),
   CONSTRAINT `autopsycase_ibfk_3` FOREIGN KEY (`JMO_StaffID`) REFERENCES `Staff` (`StaffID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Case_Table`
---
 
 DROP TABLE IF EXISTS `Case_Table`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Case_Table` (
   `CaseID` int NOT NULL AUTO_INCREMENT,
   `CaseDate` date NOT NULL,
@@ -81,35 +53,9 @@ CREATE TABLE `Case_Table` (
   PRIMARY KEY (`CaseID`),
   KEY `idx_case_date` (`CaseDate`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8mb4 */ ;
-/*!50003 SET character_set_results = utf8mb4 */ ;
-/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `AfterCaseStatusUpdate` AFTER UPDATE ON `case_table` FOR EACH ROW BEGIN
-    IF OLD.Status != NEW.Status THEN
-        INSERT INTO AuditLog (UserID, Action, TableName, RecordID)
-        VALUES (1, CONCAT('Status changed from ', OLD.Status, ' to ', NEW.Status), 'Case_Table', NEW.CaseID);
-    END IF;
-END */;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-
---
--- Table structure for table `CaseDocument`
---
 
 DROP TABLE IF EXISTS `CaseDocument`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `CaseDocument` (
   `DocumentID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -121,15 +67,9 @@ CREATE TABLE `CaseDocument` (
   KEY `CaseID` (`CaseID`),
   CONSTRAINT `casedocument_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `CaseWeapon`
---
 
 DROP TABLE IF EXISTS `CaseWeapon`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `CaseWeapon` (
   `CaseWeaponID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -141,15 +81,9 @@ CREATE TABLE `CaseWeapon` (
   CONSTRAINT `caseweapon_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE,
   CONSTRAINT `caseweapon_ibfk_2` FOREIGN KEY (`WeaponID`) REFERENCES `Weapon` (`WeaponID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `CauseOfDeath`
---
 
 DROP TABLE IF EXISTS `CauseOfDeath`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `CauseOfDeath` (
   `COD_ID` int NOT NULL AUTO_INCREMENT,
   `AutopsyCaseID` int NOT NULL,
@@ -161,15 +95,9 @@ CREATE TABLE `CauseOfDeath` (
   UNIQUE KEY `AutopsyCaseID` (`AutopsyCaseID`),
   CONSTRAINT `causeofdeath_ibfk_1` FOREIGN KEY (`AutopsyCaseID`) REFERENCES `AutopsyCase` (`AutopsyCaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `ClinicalCase`
---
 
 DROP TABLE IF EXISTS `ClinicalCase`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `ClinicalCase` (
   `ClinicalCaseID` int NOT NULL,
   `PatientID` int NOT NULL,
@@ -192,15 +120,9 @@ CREATE TABLE `ClinicalCase` (
   CONSTRAINT `clinicalcase_ibfk_3` FOREIGN KEY (`JMO_StaffID`) REFERENCES `Staff` (`StaffID`),
   CONSTRAINT `clinicalcase_ibfk_5` FOREIGN KEY (`PoliceStationID`) REFERENCES `ExternalAuthority` (`AuthID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `CourtReport`
---
 
 DROP TABLE IF EXISTS `CourtReport`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `CourtReport` (
   `ReportID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -214,15 +136,9 @@ CREATE TABLE `CourtReport` (
   CONSTRAINT `courtreport_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE,
   CONSTRAINT `courtreport_ibfk_2` FOREIGN KEY (`SignedByStaffID`) REFERENCES `Staff` (`StaffID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `CourtSummons`
---
 
 DROP TABLE IF EXISTS `CourtSummons`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `CourtSummons` (
   `SummonsID` int NOT NULL AUTO_INCREMENT,
   `StaffID` int NOT NULL,
@@ -236,15 +152,9 @@ CREATE TABLE `CourtSummons` (
   CONSTRAINT `courtsummons_ibfk_1` FOREIGN KEY (`StaffID`) REFERENCES `Staff` (`StaffID`),
   CONSTRAINT `courtsummons_ibfk_2` FOREIGN KEY (`AuthorityID`) REFERENCES `ExternalAuthority` (`AuthID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Deceased`
---
 
 DROP TABLE IF EXISTS `Deceased`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Deceased` (
   `DeceasedID` int NOT NULL,
   `DateOfDeath` date DEFAULT NULL,
@@ -252,30 +162,18 @@ CREATE TABLE `Deceased` (
   PRIMARY KEY (`DeceasedID`),
   CONSTRAINT `deceased_ibfk_1` FOREIGN KEY (`DeceasedID`) REFERENCES `Person` (`PersonID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Department`
---
 
 DROP TABLE IF EXISTS `Department`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Department` (
   `DeptID` int NOT NULL AUTO_INCREMENT,
   `DeptName` varchar(100) NOT NULL,
   `Location` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`DeptID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `ExternalAuthority`
---
 
 DROP TABLE IF EXISTS `ExternalAuthority`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `ExternalAuthority` (
   `AuthID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(100) NOT NULL,
@@ -283,15 +181,9 @@ CREATE TABLE `ExternalAuthority` (
   `ContactInfo` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`AuthID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Injury`
---
 
 DROP TABLE IF EXISTS `Injury`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Injury` (
   `InjuryID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -303,15 +195,9 @@ CREATE TABLE `Injury` (
   KEY `CaseID` (`CaseID`),
   CONSTRAINT `injury_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `InquestOrder`
---
 
 DROP TABLE IF EXISTS `InquestOrder`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `InquestOrder` (
   `InquestID` int NOT NULL AUTO_INCREMENT,
   `AutopsyCaseID` int NOT NULL,
@@ -324,15 +210,9 @@ CREATE TABLE `InquestOrder` (
   CONSTRAINT `inquestorder_ibfk_1` FOREIGN KEY (`AutopsyCaseID`) REFERENCES `AutopsyCase` (`AutopsyCaseID`),
   CONSTRAINT `inquestorder_ibfk_2` FOREIGN KEY (`AuthorityID`) REFERENCES `ExternalAuthority` (`AuthID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `InternalExamination`
---
 
 DROP TABLE IF EXISTS `InternalExamination`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `InternalExamination` (
   `InternalExamID` int NOT NULL AUTO_INCREMENT,
   `AutopsyCaseID` int NOT NULL,
@@ -343,15 +223,9 @@ CREATE TABLE `InternalExamination` (
   UNIQUE KEY `AutopsyCaseID` (`AutopsyCaseID`),
   CONSTRAINT `internalexamination_ibfk_1` FOREIGN KEY (`AutopsyCaseID`) REFERENCES `AutopsyCase` (`AutopsyCaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `IntoxicationRecord`
---
 
 DROP TABLE IF EXISTS `IntoxicationRecord`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `IntoxicationRecord` (
   `RecordID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -362,15 +236,9 @@ CREATE TABLE `IntoxicationRecord` (
   KEY `CaseID` (`CaseID`),
   CONSTRAINT `intoxicationrecord_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `LabRequest`
---
 
 DROP TABLE IF EXISTS `LabRequest`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `LabRequest` (
   `RequestID` int NOT NULL AUTO_INCREMENT,
   `SpecimenID` int NOT NULL,
@@ -384,15 +252,9 @@ CREATE TABLE `LabRequest` (
   CONSTRAINT `labrequest_ibfk_1` FOREIGN KEY (`SpecimenID`) REFERENCES `Specimen` (`SpecimenID`),
   CONSTRAINT `labrequest_ibfk_2` FOREIGN KEY (`TargetLabID`) REFERENCES `ExternalAuthority` (`AuthID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `LabResult`
---
 
 DROP TABLE IF EXISTS `LabResult`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `LabResult` (
   `ResultID` int NOT NULL AUTO_INCREMENT,
   `RequestID` int NOT NULL,
@@ -402,15 +264,9 @@ CREATE TABLE `LabResult` (
   UNIQUE KEY `RequestID` (`RequestID`),
   CONSTRAINT `labresult_ibfk_1` FOREIGN KEY (`RequestID`) REFERENCES `LabRequest` (`RequestID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `MLEF_PartB_Details`
---
 
 DROP TABLE IF EXISTS `MLEF_PartB_Details`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `MLEF_PartB_Details` (
   `DetailID` int NOT NULL AUTO_INCREMENT,
   `ClinicalCaseID` int NOT NULL,
@@ -429,30 +285,21 @@ CREATE TABLE `MLEF_PartB_Details` (
   KEY `ClinicalCaseID` (`ClinicalCaseID`),
   CONSTRAINT `mlef_partb_details_ibfk_1` FOREIGN KEY (`ClinicalCaseID`) REFERENCES `ClinicalCase` (`ClinicalCaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Temporary view structure for view `mlr_dashboard`
---
 
 DROP TABLE IF EXISTS `mlr_dashboard`;
-/*!50001 DROP VIEW IF EXISTS `mlr_dashboard`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 /*!50001 CREATE VIEW `mlr_dashboard` AS SELECT 
  1 AS `CaseID`,
  1 AS `CaseDate`,
  1 AS `Status`,
  1 AS `CaseType`*/;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `Notification`
 --
 
 DROP TABLE IF EXISTS `Notification`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Notification` (
   `NotificationID` int NOT NULL AUTO_INCREMENT,
   `UserID` int NOT NULL,
@@ -463,15 +310,9 @@ CREATE TABLE `Notification` (
   KEY `UserID` (`UserID`),
   CONSTRAINT `notification_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `UserAccount` (`UserID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Patient`
---
 
 DROP TABLE IF EXISTS `Patient`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Patient` (
   `PatientID` int NOT NULL,
   `Address` varchar(255) DEFAULT NULL,
@@ -479,30 +320,21 @@ CREATE TABLE `Patient` (
   PRIMARY KEY (`PatientID`),
   CONSTRAINT `patient_ibfk_1` FOREIGN KEY (`PatientID`) REFERENCES `Person` (`PersonID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Temporary view structure for view `pendinglabrequests`
---
 
 DROP TABLE IF EXISTS `pendinglabrequests`;
-/*!50001 DROP VIEW IF EXISTS `pendinglabrequests`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 /*!50001 CREATE VIEW `pendinglabrequests` AS SELECT 
  1 AS `RequestID`,
  1 AS `SpecimenType`,
  1 AS `RequestDate`,
  1 AS `LabName`*/;
-SET character_set_client = @saved_cs_client;
 
 --
 -- Table structure for table `Person`
 --
 
 DROP TABLE IF EXISTS `Person`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Person` (
   `PersonID` int NOT NULL AUTO_INCREMENT,
   `FirstName` varchar(50) NOT NULL,
@@ -514,15 +346,9 @@ CREATE TABLE `Person` (
   UNIQUE KEY `NIC` (`NIC`),
   KEY `idx_person_nic` (`NIC`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Role`
---
 
 DROP TABLE IF EXISTS `Role`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Role` (
   `RoleID` int NOT NULL AUTO_INCREMENT,
   `RoleName` varchar(50) NOT NULL,
@@ -530,15 +356,9 @@ CREATE TABLE `Role` (
   PRIMARY KEY (`RoleID`),
   UNIQUE KEY `RoleName` (`RoleName`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `SexualAssaultExam`
---
 
 DROP TABLE IF EXISTS `SexualAssaultExam`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `SexualAssaultExam` (
   `ExamID` int NOT NULL AUTO_INCREMENT,
   `ClinicalCaseID` int NOT NULL,
@@ -549,15 +369,9 @@ CREATE TABLE `SexualAssaultExam` (
   UNIQUE KEY `ClinicalCaseID` (`ClinicalCaseID`),
   CONSTRAINT `sexualassaultexam_ibfk_1` FOREIGN KEY (`ClinicalCaseID`) REFERENCES `ClinicalCase` (`ClinicalCaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Specimen`
---
 
 DROP TABLE IF EXISTS `Specimen`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Specimen` (
   `SpecimenID` int NOT NULL AUTO_INCREMENT,
   `CaseID` int NOT NULL,
@@ -568,15 +382,9 @@ CREATE TABLE `Specimen` (
   KEY `CaseID` (`CaseID`),
   CONSTRAINT `specimen_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Staff`
---
 
 DROP TABLE IF EXISTS `Staff`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Staff` (
   `StaffID` int NOT NULL AUTO_INCREMENT,
   `UserID` int NOT NULL,
@@ -590,15 +398,9 @@ CREATE TABLE `Staff` (
   CONSTRAINT `staff_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `UserAccount` (`UserID`),
   CONSTRAINT `staff_ibfk_2` FOREIGN KEY (`DeptID`) REFERENCES `Department` (`DeptID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `UserAccount`
---
 
 DROP TABLE IF EXISTS `UserAccount`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `UserAccount` (
   `UserID` int NOT NULL AUTO_INCREMENT,
   `RoleID` int NOT NULL,
@@ -610,82 +412,22 @@ CREATE TABLE `UserAccount` (
   KEY `RoleID` (`RoleID`),
   CONSTRAINT `useraccount_ibfk_1` FOREIGN KEY (`RoleID`) REFERENCES `Role` (`RoleID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Ward`
---
 
 DROP TABLE IF EXISTS `Ward`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Ward` (
   `WardID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) NOT NULL,
   `HospitalLocation` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`WardID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Weapon`
---
 
 DROP TABLE IF EXISTS `Weapon`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `Weapon` (
   `WeaponID` int NOT NULL AUTO_INCREMENT,
   `Type` enum('Blunt','Sharp','Firearm','Explosive','Other') NOT NULL,
   `Description` text,
   PRIMARY KEY (`WeaponID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Final view structure for view `mlr_dashboard`
---
-
-/*!50001 DROP VIEW IF EXISTS `mlr_dashboard`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `mlr_dashboard` AS select `ct`.`CaseID` AS `CaseID`,`ct`.`CaseDate` AS `CaseDate`,`ct`.`Status` AS `Status`,'Clinical' AS `CaseType` from (`clinicalcase` `c` join `case_table` `ct` on((`c`.`ClinicalCaseID` = `ct`.`CaseID`))) union all select `a`.`AutopsyCaseID` AS `AutopsyCaseID`,`ct`.`CaseDate` AS `CaseDate`,`ct`.`Status` AS `Status`,'Autopsy' AS `CaseType` from (`autopsycase` `a` join `case_table` `ct` on((`a`.`AutopsyCaseID` = `ct`.`CaseID`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-
---
--- Final view structure for view `pendinglabrequests`
---
-
-/*!50001 DROP VIEW IF EXISTS `pendinglabrequests`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `pendinglabrequests` AS select `l`.`RequestID` AS `RequestID`,`s`.`SpecimenType` AS `SpecimenType`,`l`.`RequestDate` AS `RequestDate`,`e`.`Name` AS `LabName` from ((`labrequest` `l` join `specimen` `s` on((`l`.`SpecimenID` = `s`.`SpecimenID`))) join `externalauthority` `e` on((`l`.`TargetLabID` = `e`.`AuthID`))) where (`l`.`Status` = 'Pending') */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2026-07-23  8:36:46
