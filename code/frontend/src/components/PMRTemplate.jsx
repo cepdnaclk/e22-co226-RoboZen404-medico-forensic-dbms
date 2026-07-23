@@ -79,7 +79,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           </div>
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>Courts</span>
-            <span style={valueStyle}>{inquestOrder?.AuthType === 'Magistrate' ? 'Magistrate Court' : 'N/A'}</span>
+            <span style={valueStyle}>{inquestOrder?.AuthorityType === 'Court' ? 'Magistrate Court' : (inquestOrder?.AuthorityType || 'N/A')}</span>
           </div>
         </div>
 
@@ -129,7 +129,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
           <div style={{ flex: 1, ...cellStyle }}>
             <span style={labelStyle}>Name and designation of the person who requested the Post-Mortem Examination</span>
             <span style={valueStyle}>
-              {inquestOrder ? `${inquestOrder.AuthorityName} (${inquestOrder.AuthType})` : 'N/A'}
+              {inquestOrder ? `${inquestOrder.AuthorityName} (${inquestOrder.AuthorityType})` : 'N/A'}
             </span>
           </div>
         </div>
@@ -148,7 +148,7 @@ const PMRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
         <div style={{ display: 'flex' }}>
           <div style={{ flex: 1, ...cellStyle, minHeight: '60px' }}>
             <span style={labelStyle}>Names and Addresses of persons who identified the body</span>
-            <span style={valueStyle}></span>
+            <span style={valueStyle}>{caseDetail.IdentifiedBy || ''}</span>
           </div>
         </div>
       </div>

@@ -3,27 +3,11 @@ import React, { forwardRef } from 'react';
 const MLRTemplate = forwardRef(({ report, caseDetail, extraDetails }, ref) => {
   if (!report || !caseDetail) return null;
 
-  const partB = caseDetail.partB || {
-    ExaminationPlace: 'OPD - Room 4',
-    ExaminationDate: new Date().toISOString(),
-    DischargeDate: new Date(Date.now() + 86400000).toISOString(),
-    Investigations: 'X-Ray of left forearm (No fractures). CT Brain (Normal).',
-    CategoryOfHurt: 'Grievous',
-    EndangersLife: 0,
-    CausativeWeapon: 'Blunt',
-    Remarks: 'Injuries are consistent with an assault as described by the patient. No defensive wounds noted.'
-  };
+  const partB = caseDetail.partB || {};
 
-  const intoxicationRecords = caseDetail.intoxicationRecords?.length > 0 ? caseDetail.intoxicationRecords : [
-    { SubstanceType: 'Alcohol', Consumed: true, UnderInfluence: false }
-  ];
+  const intoxicationRecords = caseDetail.intoxicationRecords || [];
 
-  const injuries = caseDetail.injuries?.length > 0 ? caseDetail.injuries : [
-    { Type: 'Laceration', Dimensions: '5cm x 2cm', Location: 'Left forearm', Description: 'Irregular wound with bruised edges.' },
-    { Type: 'Abrasion', Dimensions: '3cm x 3cm', Location: 'Right knee', Description: 'Superficial scraping of skin.' },
-    { Type: 'Contusion', Dimensions: '4cm x 4cm', Location: 'Left temple', Description: 'Bluish discoloration with swelling.' },
-    { Type: 'Stab', Dimensions: '2cm x 0.5cm', Location: 'Left shoulder', Description: 'Clean cut wound.' }
-  ];
+  const injuries = caseDetail.injuries || [];
 
   const pageStyle = {
     width: '210mm',

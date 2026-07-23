@@ -34,6 +34,7 @@ CREATE TABLE `AutopsyCase` (
   `JMO_StaffID` int NOT NULL,
   `PM_No` varchar(50) DEFAULT NULL,
   `PlaceOfDeath` varchar(255) DEFAULT NULL,
+  `IdentifiedBy` varchar(255) DEFAULT NULL,
   `AutopsyDate` datetime DEFAULT NULL,
   PRIMARY KEY (`AutopsyCaseID`),
   UNIQUE KEY `PM_No` (`PM_No`),
@@ -399,3 +400,73 @@ CREATE TABLE `Weapon` (
   PRIMARY KEY (`WeaponID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- ==========================================
+-- 2. VIEWS
+-- ==========================================
+
+DROP VIEW IF EXISTS `PendingLabRequests`;
+CREATE VIEW `PendingLabRequests` AS
+SELECT 
+    lr.RequestID, 
+    s.SpecimenType, 
+    lr.RequestDate, 
+    ea.Name AS LabName
+FROM LabRequest lr
+JOIN Specimen s ON lr.SpecimenID = s.SpecimenID
+JOIN ExternalAuthority ea ON lr.TargetLabID = ea.AuthID
+WHERE lr.Status = 'Pending';
+
+-- ==========================================
+-- 3. TRIGGERS
+-- ==========================================
+
+DELIMITER //
+DROP TRIGGER IF EXISTS AfterCaseStatusUpdate //
+CREATE TRIGGER AfterCaseStatusUpdate
+AFTER UPDATE ON Case_Table
+FOR EACH ROW
+BEGIN
+    IF OLD.Status != NEW.Status THEN
+        INSERT INTO AuditLog (UserID, Action, TableName, RecordID)
+        VALUES (1, CONCAT('Status changed from ', OLD.Status, ' to ', NEW.Status), 'Case_Table', NEW.CaseID);
+    END IF;
+END //
+DELIMITER ;
+
+-- ==========================================
+-- 4. STORED PROCEDURES
+-- ==========================================
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS RegisterNewPatient //
+CREATE PROCEDURE RegisterNewPatient(
+    IN p_FirstName VARCHAR(50),
+    IN p_LastName VARCHAR(50),
+    IN p_DOB DATE,
+    IN p_Gender ENUM('Male','Female','Other'),
+    IN p_NIC VARCHAR(20),
+    IN p_Address VARCHAR(255),
+    IN p_EmergencyContact VARCHAR(50)
+)
+BEGIN
+    DECLARE v_PersonID INT;
+    
+    START TRANSACTION;
+    
+    INSERT INTO Person (FirstName, LastName, DOB, Gender, NIC)
+    VALUES (p_FirstName, p_LastName, p_DOB, p_Gender, p_NIC);
+    
+    SET v_PersonID = LAST_INSERT_ID();
+    
+    INSERT INTO Patient (PatientID, Address, EmergencyContact)
+    VALUES (v_PersonID, p_Address, p_EmergencyContact);
+    
+    COMMIT;
+END //
+DELIMITER ;
+
+-- ==========================================
+-- 5. SECURITY & PRIVILEGES
+-- ==========================================
+CREATE USER IF NOT EXISTS 'clerk_user'@'localhost' IDENTIFIED BY 'clerk123';
+GRANT SELECT, INSERT ON ForensicMedicalDB.ClinicalCase TO 'clerk_user'@'localhost';

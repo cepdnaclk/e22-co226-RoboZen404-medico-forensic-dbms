@@ -57,8 +57,8 @@ const MLEFTemplate = forwardRef(({ caseDetail }, ref) => {
 
   return (
     <div ref={ref} style={{
-      width: '210mm',
-      minHeight: '297mm',
+      width: '100%',
+      maxWidth: '210mm',
       padding: '10mm',
       backgroundColor: '#ffffff',
       fontFamily: '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif',

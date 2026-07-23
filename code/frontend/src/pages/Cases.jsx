@@ -179,11 +179,45 @@ export default function ClinicalCases() {
   };
 
   const openUpdateFindings = () => {
+    const pB = showDetail.partB || {};
+    const sa = showDetail.sexualAssault || {};
+    const int = showDetail.intoxicationRecords?.[0] || {};
+    
+    // Convert ISO/DB dates to datetime-local format safely
+    const toLocalInput = (d) => {
+      if (!d) return '';
+      try {
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return '';
+        return dt.toISOString().slice(0, 16);
+      } catch { return ''; }
+    };
+
     setFindingsForm({
       injuries: showDetail.injuries || [],
-      intoxication: showDetail.intoxicationRecords?.[0] || { substanceType: '', consumed: false, underInfluence: false },
-      partB: showDetail.partB || { producedBy: '', examinationDate: '', examinationPlace: '', dischargeDate: '', causativeWeapon: '', categoryOfHurt: '', endangersLife: false, investigations: '', referrals: '', recommendations: '', remarks: '' },
-      sexualAssault: showDetail.sexualAssault || { hymenStatus: '', penetrationSigns: '', otherSigns: '' }
+      intoxication: { 
+        substanceType: int.SubstanceType || '', 
+        consumed: int.Consumed || false, 
+        underInfluence: int.UnderInfluence || false 
+      },
+      partB: { 
+        producedBy: pB.ProducedBy || '', 
+        examinationDate: toLocalInput(pB.ExaminationDate), 
+        examinationPlace: pB.ExaminationPlace || '', 
+        dischargeDate: toLocalInput(pB.DischargeDate), 
+        causativeWeapon: pB.CausativeWeapon || '', 
+        categoryOfHurt: pB.CategoryOfHurt || '', 
+        endangersLife: pB.EndangersLife || false, 
+        investigations: pB.Investigations || '', 
+        referrals: pB.Referrals || '', 
+        recommendations: pB.Recommendations || '', 
+        remarks: pB.Remarks || '' 
+      },
+      sexualAssault: { 
+        hymenStatus: sa.HymenStatus || '', 
+        penetrationSigns: sa.PenetrationSigns || '', 
+        otherSigns: sa.OtherSigns || '' 
+      }
     });
     setShowUpdateFindings(true);
   };
@@ -206,9 +240,9 @@ export default function ClinicalCases() {
       await api.updateClinicalFindings(showDetail.ClinicalCaseID, findingsForm);
       setToast('Findings updated successfully');
       setTimeout(() => setToast(''), 3000);
-      setShowUpdateFindings(false);
-      viewDetail(showDetail.ClinicalCaseID); // refresh details
+      await viewDetail(showDetail.ClinicalCaseID); // wait for details to refresh
       load();
+      setShowUpdateFindings(false); // close modal AFTER details are fully loaded
     } catch (err) { setToast(err.message); setTimeout(() => setToast(''), 3000); }
   };
 
@@ -579,8 +613,8 @@ export default function ClinicalCases() {
                     <div className="form-group"><label className="form-label">Examination Place (11)</label><input className="form-input" value={findingsForm.partB.examinationPlace} onChange={e => setFindingsForm({...findingsForm, partB: {...findingsForm.partB, examinationPlace: e.target.value}})} placeholder="e.g. Ward 3, OPD" /></div>
                   </div>
                   <div className="form-row">
-                    <div className="form-group"><label className="form-label">Examination Date & Time (11)</label><input type="datetime-local" className="form-input" value={findingsForm.partB.examinationDate ? new Date(findingsForm.partB.examinationDate).toISOString().slice(0, 16) : ''} onChange={e => setFindingsForm({...findingsForm, partB: {...findingsForm.partB, examinationDate: e.target.value}})} /></div>
-                    <div className="form-group"><label className="form-label">Date of Discharge (12)</label><input type="datetime-local" className="form-input" value={findingsForm.partB.dischargeDate ? new Date(findingsForm.partB.dischargeDate).toISOString().slice(0, 16) : ''} onChange={e => setFindingsForm({...findingsForm, partB: {...findingsForm.partB, dischargeDate: e.target.value}})} /></div>
+                    <div className="form-group"><label className="form-label">Examination Date & Time (11)</label><input type="datetime-local" className="form-input" value={findingsForm.partB.examinationDate || ''} onChange={e => setFindingsForm({...findingsForm, partB: {...findingsForm.partB, examinationDate: e.target.value}})} /></div>
+                    <div className="form-group"><label className="form-label">Date of Discharge (12)</label><input type="datetime-local" className="form-input" value={findingsForm.partB.dischargeDate || ''} onChange={e => setFindingsForm({...findingsForm, partB: {...findingsForm.partB, dischargeDate: e.target.value}})} /></div>
                   </div>
                 </div>
 

@@ -48,7 +48,7 @@ router.get('/:id', verifyToken, async (req, res) => {
         const [internalExam] = await pool.query('SELECT * FROM InternalExamination WHERE AutopsyCaseID = ?', [req.params.id]);
         const [causeOfDeath] = await pool.query('SELECT * FROM CauseOfDeath WHERE AutopsyCaseID = ?', [req.params.id]);
         const [inquest] = await pool.query(`
-            SELECT i.*, e.Name AS AuthorityName
+            SELECT i.*, e.Name AS AuthorityName, e.Type AS AuthorityType
             FROM InquestOrder i
             LEFT JOIN ExternalAuthority e ON i.AuthorityID = e.AuthID
             WHERE i.AutopsyCaseID = ?
@@ -82,18 +82,24 @@ router.post('/', verifyToken, async (req, res) => {
     const { firstName, lastName, dob, gender, nic, dateOfDeath, timeOfDeath,
             jmoStaffId, pmNo, placeOfDeath, autopsyDate, injuries, internalExam, causeOfDeath, inquestOrder } = req.body;
     const conn = await pool.getConnection();
+    const toMySQLDate = (d) => {
+        if (!d) return null;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return null;
+        return dt.toISOString().slice(0, 19).replace('T', ' ');
+    };
     try {
         await conn.beginTransaction();
 
         // Create Person
         const [personResult] = await conn.query(
             'INSERT INTO Person (FirstName, LastName, DOB, Gender, NIC) VALUES (?, ?, ?, ?, ?)',
-            [firstName, lastName, dob || null, gender, nic || null]
+            [firstName, lastName, toMySQLDate(dob), gender, nic || null]
         );
         // Create Deceased
         await conn.query(
             'INSERT INTO Deceased (DeceasedID, DateOfDeath, TimeOfDeath) VALUES (?, ?, ?)',
-            [personResult.insertId, dateOfDeath || null, timeOfDeath || null]
+            [personResult.insertId, toMySQLDate(dateOfDeath), timeOfDeath || null]
         );
         // Create Case_Table entry
         const [caseResult] = await conn.query(
@@ -104,7 +110,7 @@ router.post('/', verifyToken, async (req, res) => {
         // Create AutopsyCase
         await conn.query(
             'INSERT INTO AutopsyCase (AutopsyCaseID, DeceasedID, JMO_StaffID, PM_No, PlaceOfDeath, AutopsyDate) VALUES (?, ?, ?, ?, ?, ?)',
-            [caseId, personResult.insertId, jmoStaffId, pmNo, placeOfDeath || null, autopsyDate || null]
+            [caseId, personResult.insertId, jmoStaffId, pmNo, placeOfDeath || null, toMySQLDate(autopsyDate)]
         );
 
         if (injuries && injuries.length > 0) {
@@ -180,12 +186,20 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
 
 // Update case findings (JMO only)
 router.put('/:id/findings', verifyToken, async (req, res) => {
-    const { internalExam, causeOfDeath } = req.body;
+    const { internalExam, causeOfDeath, identifiedBy } = req.body;
     const caseId = req.params.id;
     const conn = await pool.getConnection();
 
     try {
         await conn.beginTransaction();
+
+        // Update Identified By
+        if (identifiedBy !== undefined) {
+            await conn.query(
+                'UPDATE AutopsyCase SET IdentifiedBy = ? WHERE AutopsyCaseID = ?',
+                [identifiedBy, caseId]
+            );
+        }
 
         // Update Internal Examination
         if (internalExam) {
