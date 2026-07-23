@@ -14,9 +14,7 @@ router.get('/stats', verifyToken, async (req, res) => {
         const [totalPatients] = await pool.query(
             'SELECT COUNT(*) AS count FROM Patient'
         );
-        const [courtDates] = await pool.query(
-            "SELECT COUNT(*) AS count FROM CourtSummons WHERE Status = 'Pending'"
-        );
+        const courtDates = [{ count: 0 }];
         const [clinicalCount] = await pool.query(
             'SELECT COUNT(*) AS count FROM ClinicalCase'
         );

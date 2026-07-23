@@ -9,8 +9,6 @@ DELETE FROM Notification;
 DELETE FROM LabResult;
 DELETE FROM LabRequest;
 DELETE FROM Specimen;
-DELETE FROM CourtReport;
-DELETE FROM CourtSummons;
 DELETE FROM CauseOfDeath;
 DELETE FROM InternalExamination;
 DELETE FROM SexualAssaultExam;
@@ -132,7 +130,7 @@ INSERT INTO ClinicalCase (ClinicalCaseID, PatientID, JMO_StaffID, PoliceStationI
 INSERT INTO AutopsyCase (AutopsyCaseID, DeceasedID, JMO_StaffID, PM_No, PlaceOfDeath, AutopsyDate) VALUES
 (3, 3, 1, 'PM/2026/001', 'Mahaweli River, Peradeniya', '2026-06-16 10:00:00'),
 (4, 4, 2, 'PM/2026/002', 'Residence, 56 Dalada Veediya', '2026-07-02 09:00:00'),
-(9, 9, 1, 'PM/2026/003', 'Roadside, Katugastota', '2026-07-20 11:00:00'),
+(9, 9, 2, 'PM/2026/003', 'Roadside, Katugastota', '2026-07-20 11:00:00'),
 (10, 10, 2, 'PM/2026/004', 'General Hospital Ward 3', '2026-07-21 14:00:00');
 
 -- Injuries
@@ -157,15 +155,18 @@ INSERT INTO IntoxicationRecord (CaseID, SubstanceType, Consumed, UnderInfluence)
 (1, 'Alcohol', TRUE, TRUE),
 (2, 'None', FALSE, FALSE);
 
--- Internal Examinations (Autopsy)
-INSERT INTO InternalExamination (AutopsyCaseID, HeadDetails, ThoraxDetails, AbdomenDetails) VALUES
-(3, 'No fractures of skull vault. Brain edematous.', 'Left lung collapsed. 200ml blood in left pleural cavity.', 'Liver and spleen normal.'),
-(4, 'Subdural hemorrhage over right cerebral hemisphere.', 'Both lungs congested. No pleural effusion.', 'Stomach contained partially digested food.');
+-- Internal Examinations
+INSERT INTO InternalExamination (AutopsyCaseID, ExaminationData) VALUES
+(3, '{"locus":"Body found in living room. Blood stains on carpet. No signs of forced entry.","external":{"general":"Well nourished adult male. Wearing blue t-shirt and jeans. No identifying marks or tattoos.","injuries":"Multiple stab wounds on chest and abdomen."},"measurements":{"height":"175 cm","age":"35 years","sex":"Male"},"features":{"eyes":"Pupils dilated, corneas cloudy","hair":"Short black hair","tongue":"Cyanotic, caught between teeth","teeth":"Intact, slight dental plaque"},"signsOfDeath":{"rigorMortis":"Present in all joints, fully established","hypostasis":"Fixed on the back, purplish-red","putrefaction":"No signs of decomposition"},"handsAndNails":"Defense wounds on forearms. Nailbeds cyanotic.","naturalOpenings":"No discharge from ears, nose or mouth.","neck":"No marks of strangulation. Trachea centrally placed.","head":{"softParts":"No bruising of scalp.","bones":"No fractures of skull vault.","membranes":"Intact, no epidural or subdural hemorrhage.","brain":"Brain edematous, weight 1350g.","vessels":"Circle of Willis intact, no aneurysms."},"spinalCord":"Not examined.","thorax":{"bones":"No rib fractures. Sternum intact.","cavity":"200ml fluid blood in left pleural cavity.","pericardium":"Intact, minimal serous fluid.","heart":"Weight 350g, no structural abnormalities.","coronaryVessels":"Patent, minimal atheroma.","largeVessels":"Aorta intact.","larynx":"Mucosa pale.","pleuraLungs":"Left lung collapsed due to hemothorax. Right lung congested.","gullet":"Empty, mucosa normal."},"abdomen":{"position":"Organs normally situated.","peritoneum":"Intact, no free fluid.","diaphragm":"Intact bilaterally.","liver":"Congested, weight 1500g. Gallbladder contains 20ml bile.","spleen":"Congested, weight 150g.","stomach":"Contains 100ml brownish fluid, smelling of alcohol.","duodenum":"Mucosa congested.","largeIntestines":"Contains formed feces.","pancreas":"Normal appearance, no fat necrosis.","kidneys":"Capsules strip easily. Corticomedullary junction distinct.","supraRenal":"Normal size and shape."},"pelvis":{"bladder":"Contains 50ml clear urine.","generative":"Normal male genitalia.","vessels":"Iliac vessels intact.","vertebrae":"Pelvic bones intact."}}'),
+(4, '{"locus":"Hospital bed.","external":{"general":"Cachectic adult male. Surgical dressing on head.","injuries":"Surgical incision over right temporal region."},"measurements":{"height":"168 cm","age":"50 years","sex":"Male"},"features":{"eyes":"Pupils unequal, right larger than left","hair":"Grey, partially shaved for surgery","tongue":"Normal","teeth":"Multiple missing teeth"},"signsOfDeath":{"rigorMortis":"Developing in small joints","hypostasis":"Faint, unfixed on back","putrefaction":"None"},"handsAndNails":"Pale nailbeds. IV access marks on back of hands.","naturalOpenings":"Normal.","neck":"Normal.","head":{"softParts":"Surgical incision and suturing on right side.","bones":"Burr holes and craniotomy bone flap on right temporal bone.","membranes":"Subdural hemorrhage over right cerebral hemisphere.","brain":"Brain flattened, midline shift to the left.","vessels":"No aneurysms seen."},"spinalCord":"Not examined.","thorax":{"bones":"Intact.","cavity":"No abnormal fluid.","pericardium":"Normal.","heart":"Normal size.","coronaryVessels":"Mild atherosclerosis.","largeVessels":"Normal.","larynx":"Normal.","pleuraLungs":"Both lungs congested. No pleural effusion.","gullet":"Normal."},"abdomen":{"position":"Normal.","peritoneum":"Normal.","diaphragm":"Normal.","liver":"Fatty changes seen.","spleen":"Normal.","stomach":"Stomach contained partially digested food.","duodenum":"Normal.","largeIntestines":"Normal.","pancreas":"Normal.","kidneys":"Normal.","supraRenal":"Normal."},"pelvis":{"bladder":"Empty.","generative":"Normal.","vessels":"Normal.","vertebrae":"Normal."}}'),
+(9, '{"locus":"Hospital bed.","external":{"general":"Obese adult male. Cast on left leg.","injuries":"Surgical incision on left thigh."},"measurements":{"height":"180 cm","age":"65 years","sex":"Male"},"features":{"eyes":"Arcus senilis present","hair":"White","tongue":"Normal","teeth":"Dentures present"},"signsOfDeath":{"rigorMortis":"Fully established","hypostasis":"Fixed on back","putrefaction":"None"},"handsAndNails":"Cyanotic nailbeds.","naturalOpenings":"Normal.","neck":"Normal.","head":{"softParts":"No abnormalities","bones":"Normal size and shape. No fractures","membranes":"Normal","brain":"Brain edematous","vessels":"Severe atherosclerosis of basal vessels"},"spinalCord":"Not examined.","thorax":{"bones":"Intact.","cavity":"No abnormal fluid.","pericardium":"Increased epicardial fat.","heart":"Heart enlarged (450g), left ventricular hypertrophy","coronaryVessels":"Coronary arteries show severe atherosclerosis. LAD 90% blocked.","largeVessels":"Severe atheroma in aorta.","larynx":"Normal.","pleuraLungs":"Pulmonary edema present.","gullet":"Normal."},"abdomen":{"position":"Normal.","peritoneum":"Normal.","diaphragm":"Normal.","liver":"Liver congested, nutmeg appearance.","spleen":"Normal.","stomach":"Stomach contains 100ml brownish fluid","duodenum":"Normal.","largeIntestines":"Normal.","pancreas":"Normal.","kidneys":"Benign nephrosclerosis.","supraRenal":"Normal."},"pelvis":{"bladder":"Normal.","generative":"Enlarged prostate.","vessels":"Atherosclerotic.","vertebrae":"Normal."}}');
 
--- Cause of Death
-INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause) VALUES
-(3, 'Hemorrhagic shock', 'Penetrating stab wound to left chest', 'Assault by sharp weapon', NULL),
-(4, 'Subdural hemorrhage', 'Blunt force trauma to head', 'Fall from height', 'Chronic alcoholism');
+-- Cause Of Death
+INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause, MaternalDeath, Comments) VALUES
+(3, 'Hemorrhagic shock', 'Penetrating stab wound to left chest', 'Assault by sharp weapon', NULL, 'None', 'No suspicious injuries noted on the rest of the body.'),
+(4, 'Subdural hemorrhage', 'Blunt force trauma to head', 'Fall from height', 'Chronic alcoholism', 'None', 'Features of surgical intervention noted on the skull.'),
+(9, 'Myocardial Infarction', 'Patient who underwent surgery for neck fracture', NULL, 'Hypertension, Ischaemic Heart Disease', 'None', 'No suspicious injuries noted on the body. Features of left femur fracture and surgical intervention noted.'),
+(10, 'Septicemia', 'Severe burn injuries', 'Accidental fire', NULL, 'None', 'Burns cover approximately 40% of total body surface area.');
 
 -- Inquest Orders
 INSERT INTO InquestOrder (AutopsyCaseID, AuthorityID, CaseNumber, DateOfIssue) VALUES
@@ -197,15 +198,6 @@ INSERT INTO LabRequest (RequestID, SpecimenID, TargetLabID, AnalysisRequired, Re
 INSERT INTO LabResult (RequestID, ResultDetails, ReceivedDate) VALUES
 (1, 'Blood alcohol concentration: 180mg/dL. Above legal limit.', '2026-06-25');
 
--- Court Reports
-INSERT INTO CourtReport (CaseID, ReportType, IssueDate, SignedByStaffID) VALUES
-(1, 'MLR', '2026-06-25', 1),
-(3, 'PMR', '2026-07-05', 1);
-
--- Court Summons
-INSERT INTO CourtSummons (StaffID, AuthorityID, CaseNo, RequiredDate, Status) VALUES
-(1, 2, 'MC/KDY/2026/1234', '2026-08-15', 'Pending'),
-(2, 5, 'HC/KDY/2026/0089', '2026-09-01', 'Pending');
 
 -- Audit Log
 INSERT INTO AuditLog (UserID, Action, TableName, RecordID) VALUES
@@ -256,6 +248,3 @@ VALUES (@CASE_ID_1, 'Alcohol', 1, 1);
 INSERT INTO MLEF_PartB_Details (ClinicalCaseID, ProducedBy, ExaminationDate, ExaminationPlace, DischargeDate, CausativeWeapon, CategoryOfHurt, EndangersLife, Investigations, Referrals, Recommendations, Remarks)
 VALUES (@CASE_ID_1, 'Sergeant Saman Silva', DATE_SUB(NOW(), INTERVAL 2 DAY), 'Trauma Unit - Bed 3', DATE_SUB(NOW(), INTERVAL 1 DAY), 'Blunt and Sharp', 'Grievous', 0, 'X-Ray Chest (No rib fractures). CT Head (Normal, no intracranial hemorrhage).', 'Referred to Surgical Unit for suturing.', 'Rest for 7 days. Antibiotics prescribed.', 'The injuries are highly consistent with the history of assault given by the patient. The scalp wound is grievous due to disfigurement.');
 
--- Issue Court Report (MLR)
-INSERT INTO CourtReport (CaseID, ReportType, SignedByStaffID, IssueDate) 
-VALUES (@CASE_ID_1, 'MLR', @JMO_STAFF_ID, NOW());
