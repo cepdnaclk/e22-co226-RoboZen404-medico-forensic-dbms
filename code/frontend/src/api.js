@@ -75,6 +75,22 @@ const api = {
   createSpecimen: (data) => request('/specimens', { method: 'POST', body: JSON.stringify(data) }),
   createLabRequest: (data) => request('/specimens/lab-request', { method: 'POST', body: JSON.stringify(data) }),
   addLabResult: (data) => request('/specimens/lab-result', { method: 'POST', body: JSON.stringify(data) }),
+  updateLabResult: async (requestId, resultDetails, receivedDate, attachment) => {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append('resultDetails', resultDetails);
+    formData.append('receivedDate', receivedDate);
+    if (attachment) formData.append('attachment', attachment);
+    
+    const res = await fetch(`${API_BASE}/specimens/${requestId}/result`, {
+      method: 'PUT',
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: formData
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Update failed');
+    return data;
+  },
   getExternalLabs: () => request('/specimens/labs'),
 
   getReports: () => request('/reports'),

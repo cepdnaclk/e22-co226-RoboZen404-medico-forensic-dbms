@@ -2,6 +2,19 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../database');
 const verifyToken = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage });
 
 // List specimens for a case
 router.get('/case/:caseId', verifyToken, async (req, res) => {
@@ -27,13 +40,15 @@ router.get('/', verifyToken, async (req, res) => {
     try {
         const [rows] = await pool.query(`
             SELECT s.*, ct.CaseDate, ct.Status AS CaseStatus,
-                   lr.Status AS LabStatus, ea.Name AS LabName,
+                   lr.RequestID, lr.Status AS LabStatus, ea.Name AS LabName,
+                   lr.AnalysisRequired, lres.ResultDetails, lres.ReceivedDate, lres.AttachmentPath,
                    COALESCE(ac.PM_No, cc.MLEF_No) AS CaseReference
             FROM Specimen s
             JOIN Case_Table ct ON s.CaseID = ct.CaseID
             LEFT JOIN AutopsyCase ac ON ct.CaseID = ac.AutopsyCaseID
             LEFT JOIN ClinicalCase cc ON ct.CaseID = cc.ClinicalCaseID
             LEFT JOIN LabRequest lr ON s.SpecimenID = lr.SpecimenID
+            LEFT JOIN LabResult lres ON lr.RequestID = lres.RequestID
             LEFT JOIN ExternalAuthority ea ON lr.TargetLabID = ea.AuthID
             ORDER BY s.CollectedDate DESC
         `);
@@ -110,6 +125,40 @@ router.post('/lab-result', verifyToken, async (req, res) => {
         res.status(500).json({ message: 'Failed to record lab result' });
     } finally {
         conn.release();
+    }
+});
+
+// Update lab result
+router.put('/:requestId/result', verifyToken, upload.single('attachment'), async (req, res) => {
+    const { resultDetails, receivedDate } = req.body;
+    const attachmentPath = req.file ? req.file.path : null;
+
+    try {
+        if (attachmentPath) {
+            await pool.query(
+                `INSERT INTO LabResult (RequestID, ResultDetails, ReceivedDate, AttachmentPath) 
+                 VALUES (?, ?, ?, ?) 
+                 ON DUPLICATE KEY UPDATE 
+                 ResultDetails = VALUES(ResultDetails), ReceivedDate = VALUES(ReceivedDate), AttachmentPath = VALUES(AttachmentPath)`,
+                [req.params.requestId, resultDetails, receivedDate, attachmentPath]
+            );
+        } else {
+            await pool.query(
+                `INSERT INTO LabResult (RequestID, ResultDetails, ReceivedDate) 
+                 VALUES (?, ?, ?) 
+                 ON DUPLICATE KEY UPDATE 
+                 ResultDetails = VALUES(ResultDetails), ReceivedDate = VALUES(ReceivedDate)`,
+                [req.params.requestId, resultDetails, receivedDate]
+            );
+        }
+
+        // Update LabRequest Status to Completed
+        await pool.query('UPDATE LabRequest SET Status = ? WHERE RequestID = ?', ['Completed', req.params.requestId]);
+
+        res.json({ message: 'Lab result saved successfully' });
+    } catch (error) {
+        console.error('Update lab result error:', error);
+        res.status(500).json({ message: 'Failed to update lab result' });
     }
 });
 

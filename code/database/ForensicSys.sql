@@ -185,9 +185,7 @@ DROP TABLE IF EXISTS `InternalExamination`;
 CREATE TABLE `InternalExamination` (
   `InternalExamID` int NOT NULL AUTO_INCREMENT,
   `AutopsyCaseID` int NOT NULL,
-  `HeadDetails` text,
-  `ThoraxDetails` text,
-  `AbdomenDetails` text,
+  `ExaminationData` json DEFAULT NULL,
   PRIMARY KEY (`InternalExamID`),
   UNIQUE KEY `AutopsyCaseID` (`AutopsyCaseID`),
   CONSTRAINT `internalexamination_ibfk_1` FOREIGN KEY (`AutopsyCaseID`) REFERENCES `AutopsyCase` (`AutopsyCaseID`) ON DELETE CASCADE
@@ -229,6 +227,7 @@ CREATE TABLE `LabResult` (
   `RequestID` int NOT NULL,
   `ResultDetails` text NOT NULL,
   `ReceivedDate` date DEFAULT NULL,
+  `AttachmentPath` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ResultID`),
   UNIQUE KEY `RequestID` (`RequestID`),
   CONSTRAINT `labresult_ibfk_1` FOREIGN KEY (`RequestID`) REFERENCES `LabRequest` (`RequestID`) ON DELETE CASCADE
