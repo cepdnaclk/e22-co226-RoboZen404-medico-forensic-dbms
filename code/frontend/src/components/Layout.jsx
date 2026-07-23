@@ -64,9 +64,6 @@ export default function Layout() {
           <NavLink to="/lab" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
             <FlaskConical size={20} /> <span className="nav-section-label">Lab Management</span>
           </NavLink>
-          <NavLink to="/reports" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Scale size={20} /> <span className="nav-section-label">Court Reports</span>
-          </NavLink>
           {user.role === 'Admin' && (
             <>
               <NavLink to="/staff" className={({isActive}) => `nav-link ${isActive ? 'active' : ''}`}>

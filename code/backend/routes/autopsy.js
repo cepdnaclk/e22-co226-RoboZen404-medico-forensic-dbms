@@ -80,7 +80,7 @@ router.get('/:id', verifyToken, async (req, res) => {
 // Create autopsy case
 router.post('/', verifyToken, async (req, res) => {
     const { firstName, lastName, dob, gender, nic, dateOfDeath, timeOfDeath,
-            jmoStaffId, pmNo, placeOfDeath, autopsyDate, injuries, internalExam, causeOfDeath } = req.body;
+            jmoStaffId, pmNo, placeOfDeath, autopsyDate, injuries, internalExam, causeOfDeath, inquestOrder } = req.body;
     const conn = await pool.getConnection();
     try {
         await conn.beginTransaction();
@@ -118,15 +118,22 @@ router.post('/', verifyToken, async (req, res) => {
 
         if (internalExam) {
             await conn.query(
-                'INSERT INTO InternalExamination (AutopsyCaseID, HeadDetails, ThoraxDetails, AbdomenDetails) VALUES (?, ?, ?, ?)',
-                [caseId, internalExam.head, internalExam.thorax, internalExam.abdomen]
+                'INSERT INTO InternalExamination (AutopsyCaseID, ExaminationData) VALUES (?, ?)',
+                [caseId, JSON.stringify(internalExam)]
             );
         }
 
         if (causeOfDeath) {
             await conn.query(
-                'INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause) VALUES (?, ?, ?, ?, ?)',
-                [caseId, causeOfDeath.immediate, causeOfDeath.antecedent, causeOfDeath.underlying, causeOfDeath.contributory]
+                'INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause, MaternalDeath, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [caseId, causeOfDeath.immediate, causeOfDeath.antecedent, causeOfDeath.underlying, causeOfDeath.contributory, causeOfDeath.maternalDeath || 'None', causeOfDeath.comments || null]
+            );
+        }
+
+        if (inquestOrder && inquestOrder.authorityId) {
+            await conn.query(
+                'INSERT INTO InquestOrder (AutopsyCaseID, AuthorityID, CaseNumber, DateOfIssue) VALUES (?, ?, ?, CURDATE())',
+                [caseId, inquestOrder.authorityId, inquestOrder.caseNumber || null]
             );
         }
 
@@ -183,22 +190,22 @@ router.put('/:id/findings', verifyToken, async (req, res) => {
         // Update Internal Examination
         if (internalExam) {
             await conn.query(
-                `INSERT INTO InternalExamination (AutopsyCaseID, HeadDetails, ThoraxDetails, AbdomenDetails) 
-                 VALUES (?, ?, ?, ?) 
+                `INSERT INTO InternalExamination (AutopsyCaseID, ExaminationData) 
+                 VALUES (?, ?) 
                  ON DUPLICATE KEY UPDATE 
-                 HeadDetails = VALUES(HeadDetails), ThoraxDetails = VALUES(ThoraxDetails), AbdomenDetails = VALUES(AbdomenDetails)`,
-                [caseId, internalExam.head, internalExam.thorax, internalExam.abdomen]
+                 ExaminationData = VALUES(ExaminationData)`,
+                [caseId, JSON.stringify(internalExam)]
             );
         }
 
         // Update Cause of Death
         if (causeOfDeath) {
             await conn.query(
-                `INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause) 
-                 VALUES (?, ?, ?, ?, ?) 
+                `INSERT INTO CauseOfDeath (AutopsyCaseID, ImmediateCause, AntecedentCause, UnderlyingCause, ContributoryCause, MaternalDeath, Comments) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?) 
                  ON DUPLICATE KEY UPDATE 
-                 ImmediateCause = VALUES(ImmediateCause), AntecedentCause = VALUES(AntecedentCause), UnderlyingCause = VALUES(UnderlyingCause), ContributoryCause = VALUES(ContributoryCause)`,
-                [caseId, causeOfDeath.immediate, causeOfDeath.antecedent, causeOfDeath.underlying, causeOfDeath.contributory]
+                 ImmediateCause = VALUES(ImmediateCause), AntecedentCause = VALUES(AntecedentCause), UnderlyingCause = VALUES(UnderlyingCause), ContributoryCause = VALUES(ContributoryCause), MaternalDeath = VALUES(MaternalDeath), Comments = VALUES(Comments)`,
+                [caseId, causeOfDeath.immediate, causeOfDeath.antecedent, causeOfDeath.underlying, causeOfDeath.contributory, causeOfDeath.maternalDeath || 'None', causeOfDeath.comments || null]
             );
         }
 

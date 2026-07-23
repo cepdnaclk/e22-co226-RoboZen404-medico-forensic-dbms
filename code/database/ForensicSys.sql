@@ -121,37 +121,6 @@ CREATE TABLE `ClinicalCase` (
   CONSTRAINT `clinicalcase_ibfk_5` FOREIGN KEY (`PoliceStationID`) REFERENCES `ExternalAuthority` (`AuthID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `CourtReport`;
-
-CREATE TABLE `CourtReport` (
-  `ReportID` int NOT NULL AUTO_INCREMENT,
-  `CaseID` int NOT NULL,
-  `ReportType` varchar(50) NOT NULL,
-  `IssueDate` date DEFAULT NULL,
-  `SignedByStaffID` int NOT NULL,
-  `FilePath` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`ReportID`),
-  KEY `CaseID` (`CaseID`),
-  KEY `SignedByStaffID` (`SignedByStaffID`),
-  CONSTRAINT `courtreport_ibfk_1` FOREIGN KEY (`CaseID`) REFERENCES `Case_Table` (`CaseID`) ON DELETE CASCADE,
-  CONSTRAINT `courtreport_ibfk_2` FOREIGN KEY (`SignedByStaffID`) REFERENCES `Staff` (`StaffID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-DROP TABLE IF EXISTS `CourtSummons`;
-
-CREATE TABLE `CourtSummons` (
-  `SummonsID` int NOT NULL AUTO_INCREMENT,
-  `StaffID` int NOT NULL,
-  `AuthorityID` int NOT NULL,
-  `CaseNo` varchar(50) NOT NULL,
-  `RequiredDate` date NOT NULL,
-  `Status` enum('Pending','Attended','Dismissed') DEFAULT 'Pending',
-  PRIMARY KEY (`SummonsID`),
-  KEY `StaffID` (`StaffID`),
-  KEY `AuthorityID` (`AuthorityID`),
-  CONSTRAINT `courtsummons_ibfk_1` FOREIGN KEY (`StaffID`) REFERENCES `Staff` (`StaffID`),
-  CONSTRAINT `courtsummons_ibfk_2` FOREIGN KEY (`AuthorityID`) REFERENCES `ExternalAuthority` (`AuthID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `Deceased`;
 

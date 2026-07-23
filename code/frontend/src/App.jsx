@@ -7,7 +7,6 @@ import Patients from './pages/Patients';
 import ClinicalCases from './pages/Cases';
 import AutopsyCases from './pages/AutopsyCases';
 import LabManagement from './pages/LabManagement';
-import CourtReports from './pages/CourtReports';
 import SettingsPage from './pages/SettingsPage';
 import Staff from './pages/Staff';
 import ReportsDashboard from './pages/ReportsDashboard';
@@ -27,7 +26,6 @@ function App() {
         <Route path="clinical" element={<ClinicalCases />} />
         <Route path="autopsy" element={<AutopsyCases />} />
         <Route path="lab" element={<LabManagement />} />
-        <Route path="reports" element={<CourtReports />} />
         <Route path="staff" element={<Staff />} />
         <Route path="report-dashboard" element={<ReportsDashboard />} />
         <Route path="settings" element={<SettingsPage />} />
@@ -37,4 +35,3 @@ function App() {
 }
 
 export default App;
-

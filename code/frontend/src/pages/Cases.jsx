@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import MLEFTemplate from '../components/MLEFTemplate';
+import MLRTemplate from '../components/MLRTemplate';
 import api from '../api';
 
 export default function ClinicalCases() {
@@ -25,7 +26,12 @@ export default function ClinicalCases() {
   const [newInjury, setNewInjury] = useState({ type: '', location: '', dimensions: '', description: '' });
   const [newDoc, setNewDoc] = useState({ type: '', file: null });
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const mlefRef = useRef(null);
+  const mlefRef = useRef();
+  
+  // MLR specific state
+  const mlrRef = useRef();
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfFormData, setPdfFormData] = useState({ magistrateCourt: '', courtCaseNo: '', dateOfTrial: '' });
 
   const load = async () => {
     try {
@@ -128,22 +134,46 @@ export default function ClinicalCases() {
   });
   const [updateInjury, setUpdateInjury] = useState({ type: '', location: '', dimensions: '', description: '' });
 
-  const generatePDF = async () => {
-    if (!mlefRef.current || !showDetail) return;
+  const generateMLRPDF = async (e) => {
+    e?.preventDefault();
+    if (!mlrRef.current || !showDetail) return;
+    setShowPdfModal(false);
     setIsGeneratingPDF(true);
     try {
-      const canvas = await html2canvas(mlefRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`MLEF_Report_${showDetail.PatientName ? showDetail.PatientName.replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown'}_${showDetail.CaseID}.pdf`);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      setToast('Failed to generate PDF');
-      setTimeout(() => setToast(''), 3000);
-    } finally {
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(mlrRef.current, { scale: 2 });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+          
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+          
+          pdf.save(`MLR_Report_${showDetail.PatientName ? showDetail.PatientName.replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown'}_${showDetail.ClinicalCaseID}.pdf`);
+        } catch (error) {
+          console.error('Canvas error:', error);
+          setToast('Failed to generate MLR PDF');
+          setTimeout(() => setToast(''), 3000);
+        } finally {
+          setIsGeneratingPDF(false);
+        }
+      }, 300);
+    } catch (err) {
+      console.error('Failed to generate MLR PDF:', err);
       setIsGeneratingPDF(false);
     }
   };
@@ -182,6 +212,48 @@ export default function ClinicalCases() {
     } catch (err) { setToast(err.message); setTimeout(() => setToast(''), 3000); }
   };
 
+  const generateMLEFPDF = async () => {
+    if (!mlefRef.current || !showDetail) return;
+    setIsGeneratingPDF(true);
+    try {
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(mlefRef.current, { scale: 2 });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+          
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+          
+          pdf.save(`MLEF_Report_${showDetail.PatientName ? showDetail.PatientName.replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown'}_${showDetail.ClinicalCaseID}.pdf`);
+        } catch (e) {
+          console.error('Canvas error:', e);
+          setToast('Failed to generate PDF');
+          setTimeout(() => setToast(''), 3000);
+        } finally {
+          setIsGeneratingPDF(false);
+        }
+      }, 300);
+    } catch (err) {
+      console.error('Failed to generate MLR:', err);
+      setIsGeneratingPDF(false);
+    }
+  };
+
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const canEdit = user.role === 'Admin' || user.role === 'Doctor';
   const canCreate = user.role === 'Admin' || user.role === 'Clerk';
@@ -193,6 +265,16 @@ export default function ClinicalCases() {
       {/* Hidden MLEF Template for PDF generation */}
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
         <MLEFTemplate ref={mlefRef} caseDetail={showDetail} />
+      </div>
+
+      {/* Hidden MLR Template for PDF generation */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        <MLRTemplate 
+          ref={mlrRef} 
+          report={{ ReportID: showDetail?.ClinicalCaseID, IssueDate: new Date().toISOString() }} 
+          caseDetail={showDetail} 
+          extraDetails={pdfFormData} 
+        />
       </div>
 
       <div className="section-header">
@@ -403,6 +485,38 @@ export default function ClinicalCases() {
                 </form>
               </div>
 
+              <div className="card detail-section" style={{ marginTop: '1rem' }}>
+                <h3>Forms & Reports</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FileText size={18} style={{ color: 'var(--primary-color)' }} />
+                      <span style={{ fontWeight: 500 }}>Medico-Legal Examination Form (MLEF)</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {canEdit && showDetail.Status === 'Open' && (
+                        <button className="btn btn-primary btn-sm" onClick={() => openUpdateFindings()}><FileText size={14} /> Edit</button>
+                      )}
+                      <button className="btn btn-secondary btn-sm" onClick={generateMLEFPDF} disabled={isGeneratingPDF}>
+                        <Printer size={14} /> PDF
+                      </button>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FileText size={18} style={{ color: 'var(--primary-color)' }} />
+                      <span style={{ fontWeight: 500 }}>Medico-Legal Report (MLR)</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => setShowPdfModal(true)} disabled={isGeneratingPDF}>
+                        <Printer size={14} /> PDF
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="card qr-panel" style={{ marginTop: '1rem' }} id="qr-print-area">
                 <h3 style={{ fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--tertiary-label)' }}>Evidence QR</h3>
                 <div className="qr-bg"><QRCodeSVG value={`forensicsys://mlef/${showDetail.MLEF_No}`} size={140} id={`qr-svg-${showDetail.MLEF_No}`} /></div>
@@ -427,11 +541,7 @@ export default function ClinicalCases() {
             </div>
             <div className="modal-footer" style={{ borderTop: '1px solid var(--separator)', paddingTop: '1rem', marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                {showDetail.Status === 'Closed' && (
-                  <button className="btn btn-secondary" onClick={generatePDF} disabled={isGeneratingPDF} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <FileText size={16} /> {isGeneratingPDF ? 'Generating...' : 'Download PDF'}
-                  </button>
-                )}
+                {/* Removed redundant Download PDF button */}
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {(user.role === 'Admin' || ((user.role === 'Doctor' || user.role === 'JMO') && showDetail.JMO_StaffID === user.staffId)) && showDetail.Status === 'Open' && (
@@ -736,6 +846,40 @@ export default function ClinicalCases() {
       {toast && (
         <div className="toast-container">
           <div className="toast">{toast}</div>
+        </div>
+      )}
+
+      {/* MLR PDF Form Modal */}
+      {showPdfModal && (
+        <div className="modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="modal" style={{ maxWidth: '400px' }}>
+            <div className="modal-header">
+              <h2>Generate MLR PDF</h2>
+              <button onClick={() => setShowPdfModal(false)}><X size={14} /></button>
+            </div>
+            <form onSubmit={generateMLRPDF}>
+              <div className="modal-body">
+                <div className="form-section" style={{ margin: 0 }}>
+                  <div className="form-group">
+                    <label className="form-label">Magistrate's Court</label>
+                    <input type="text" className="form-input" value={pdfFormData.magistrateCourt} onChange={e => setPdfFormData({...pdfFormData, magistrateCourt: e.target.value})} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Court Case No.</label>
+                    <input type="text" className="form-input" value={pdfFormData.courtCaseNo} onChange={e => setPdfFormData({...pdfFormData, courtCaseNo: e.target.value})} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Date of Trial</label>
+                    <input type="date" className="form-input" value={pdfFormData.dateOfTrial} onChange={e => setPdfFormData({...pdfFormData, dateOfTrial: e.target.value})} />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-soft" onClick={() => setShowPdfModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Generate PDF</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
