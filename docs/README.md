@@ -6,7 +6,7 @@ repository-name: e22-co226-ForensicSys-Medico-Forensic-DBMS
 title: ForensicSys - Medico Forensic DBMS
 ---
 
-# Medico Forensic DBMS — Department of Forensic Medicine Management System
+# ForensicSys - Medico Forensic DBMS — Department of Forensic Medicine Management System
 
 ---
 
