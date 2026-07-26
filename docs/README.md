@@ -2,7 +2,7 @@
 layout: home
 permalink: index.html
 
-repository-name: e22-co226-RoboZen404-medico-forensic-dbms
+repository-name: e22-co226-ForensicSys-Medico-Forensic-DBMS
 title: ForensicSys - Medico Forensic DBMS
 ---
 
